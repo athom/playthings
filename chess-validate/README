@@ -1,0 +1,9 @@
+== Usage
+just run the script bin/main.rb, and the result file will be generated to the current directory.
+
+== Requirement
+ruby-1.9.2, not ruby-1.8.7
+
+== Source
+http://puzzlenode.com/puzzles/22
+
