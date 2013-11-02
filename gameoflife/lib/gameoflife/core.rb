@@ -11,6 +11,10 @@ module GameOfLife
         end
       end
 
+      update
+    end
+
+    def update
       @world.reject!{|k, v|v.nil? || v == 0}
       @static_world = @world.clone
     end
@@ -40,8 +44,7 @@ module GameOfLife
         end
       end
 
-      @world.reject!{|k, v|v.nil?}
-      @static_world = @world.clone
+      update
     end
 
     def next_state x, y
