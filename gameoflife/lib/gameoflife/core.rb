@@ -16,14 +16,14 @@ module GameOfLife
 
     def update
       @world.reject!{|k, v|v.nil? || v == 0}
-      @static_world = @world.clone
+      @current_world = @world.clone
     end
 
     def neighbor_count x, y
       count_map = {}
       (-1..1).each do |i|
         (-1..1).each do |j|
-          count_map[[x+i,y+j]] = @static_world[[x+i,y+j]]
+          count_map[[x+i,y+j]] = @current_world[[x+i,y+j]]
         end
       end
       count_map.reject! {|k, v| v.nil?}
@@ -32,7 +32,7 @@ module GameOfLife
 
     def next_world
       visited_pos = {}
-      @static_world.each do |k, v|
+      @current_world.each do |k, v|
         x,y = k[0], k[1]
         (-1..1).each do |i|
           (-1..1).each do |j|
@@ -50,7 +50,7 @@ module GameOfLife
     def next_state x, y
       conditions = {
         1 => DEAD,
-        2 => @static_world[[x,y]],
+        2 => @current_world[[x,y]],
         3 => LIVE,
         4 => DEAD,
         5 => DEAD,
