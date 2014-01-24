@@ -15,7 +15,7 @@ module MatrixTrails
     def spiral_indexes
       positions = (0...@height).to_a.product((0...@width).to_a).to_a
 
-      def positions.trim_line(need_revert, index)
+      def positions.trim_edge(need_revert, index)
         line = []
         self.reject! do |pair|
           if yield pair
@@ -34,10 +34,10 @@ module MatrixTrails
       trails = []
       i = 0
       until positions.empty?
-        trails += positions.trim_line(false, 0) {|pair| pair[0] == i}
-        trails += positions.trim_line(false, 1) {|pair| pair[1] == @width -1 -i}
-        trails += positions.trim_line(true, 1) {|pair| pair[0] == @height -1 -i}
-        trails += positions.trim_line(true, 0) {|pair| pair[1] == i}
+        trails += positions.trim_edge(false, 0) {|pair| pair[0] == i}
+        trails += positions.trim_edge(false, 1) {|pair| pair[1] == @width -1 -i}
+        trails += positions.trim_edge(true, 1) {|pair| pair[0] == @height -1 -i}
+        trails += positions.trim_edge(true, 0) {|pair| pair[1] == i}
         i += 1
       end
       trails
