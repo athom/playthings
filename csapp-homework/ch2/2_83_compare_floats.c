@@ -32,7 +32,13 @@ int float_age(float x, float y){
             )
             ||
             (
-                 (sx^sy) && !sx
+                (sx^sy)
+                    &&
+                (
+                    (ux<<1)^(uy<<1)
+                        &&
+                    !sx
+                )
             );
 }
 
@@ -59,5 +65,12 @@ int main(){
     printf("%x\n", i1); // 0
     i1 = float_age(3.15, -3.14);
     printf("%x\n", i1); // 1
+
+
+    i1 = float_age(0.0, -0.0);
+    printf("%x\n", i1); // 0
+    i1 = float_age(-0.0, 0.0);
+    printf("%x\n", i1); // 0
+
     return 0;
 }
