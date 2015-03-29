@@ -1,0 +1,5 @@
+A: false,   y = TMin
+B: true
+C: false,   y = -8, x = 1
+D: true
+E: true
