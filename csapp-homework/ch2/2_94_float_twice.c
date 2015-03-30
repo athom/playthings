@@ -52,8 +52,11 @@ float_bits float_twice(float_bits f){
 
 
     float_bits size = (f >> 31) <<31;
-    float_bits exp = (f >> 23)&0xFF;
-    float_bits new_exp = (exp + 1) << 23;
+    float_bits exp = ((f >> 23)&0xFF) + 1;
+    float_bits new_exp = exp << 23;
+    if(!(~exp)){
+        return (size | new_exp | 0x000000);
+    }
     return (size | new_exp | (f & 0x7FFFFF));
 }
 
