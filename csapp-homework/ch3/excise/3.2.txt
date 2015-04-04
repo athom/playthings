@@ -1,0 +1,8 @@
+1 movl
+2 movw
+3 movb
+4 movb
+5 pushl
+6 movzl
+7 popl
+

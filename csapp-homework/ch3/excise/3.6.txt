@@ -1,0 +1,6 @@
+leal 6(%eax), %edx                =>  x+6
+leal (%eax, %ecx), %edx           =>  x + y
+leal (%eax, %ecx, 4), %edx        =>  4y + x
+leal 7(%eax, %eax, 8), %edx       =>  9x + 7
+leal 0xA(, %eax, 4), %edx         =>  0xA + 4x
+leal 9(%eax, %ecx, 2), %edx       =>  2y+x+9

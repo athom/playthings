@@ -1,0 +1,6 @@
+{
+  int t1 = y;
+  int t2 = x^t1;
+  int t3 = t2>>3;
+  int t4 = ~t3-z;
+}

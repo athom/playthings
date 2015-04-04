@@ -1,0 +1,5 @@
+S+1             short*            xs + 2             leal 2(%edx), %eax
+S[3]            short             M[xs + 6]          movw 6(%edx), %eax
+&S[i]           short*            xs + 2*i           leal (%edx, %ecx, 2), %eax
+S[4*i+1]        short             M[sx + 8*i+ 2]     movw 2(%edx, %ecx, 8), %eax
+S+i-5           short*            xs + 2*i - 10      leal -10(%edx, %ecx, 2), %eax

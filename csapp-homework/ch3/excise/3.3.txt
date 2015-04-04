@@ -1,0 +1,7 @@
+1 addr
+2 movl %eax
+3 movl
+4 no sh register
+5 im can not be des
+6 movb
+7 movl
