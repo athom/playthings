@@ -1,0 +1,29 @@
+struct P1{
+  int i;       //      0
+  char c;      //      4
+  long j;      //      8
+  char d;      //      16
+};             // size = 24
+
+
+struct P2{
+  long i;     //        0
+  char c;     //        8
+  char d;     //        9
+  int j;      //        12
+};            // size = 16
+
+struct P3{
+  short w[3]; //  0
+  char c[3];  //  6
+};            //  10
+
+struct P4{
+  short w[3]; //  0
+  char* c[3]; //  8
+};            //  32
+
+struct P5{
+  struct P1 a[2];  //  0
+  struct P2* p;    //  48
+};                 //  56
