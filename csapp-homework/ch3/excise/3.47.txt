@@ -1,0 +1,8 @@
+src_t               des_t               instruction               S                 D
+long                long                movq                      %rdi              %rax
+int                 long                movslq                    %edi              %rax
+char                long                movsbq                    %dil              %rax
+unsigned int        unsigned long       movl                      %edi              %eax
+unsigned char       unsigned long       movzbq                    %dil              %rax
+long                int                 movslq                    %edi              %rax
+unsigned long       unsigned            movl                      %edi              %eax
