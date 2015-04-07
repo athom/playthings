@@ -1,0 +1,31 @@
+// dest at %epb+8; x at %ebp + 12; y at %ebp + 20
+movl 12(%ebp), %esi         // fetch xl
+movl 20(%bp), %eax          // fetch y
+movl %eax, %edx             // copy y to edx
+sarl $31, %edx              // y >> 31
+movl %edx, %ecx             // copy y >> 31 to ecx
+imull %esi, %ecx            // (y >> 31) * xl
+movl 16(%ebp), %ebx         // fetch xh
+imull %eax, %ebx            // xh * y
+addl %ebx, %ecx             // xh*y + (y >> 31)*xl
+mull %esi                   // j = xl * y edx = jh; eax = jl
+leal (%ecx, %edx), %edx     // edx = jh + xh*y + (y >> 31)*xl
+movl 8(%ebp), %ecx          // ecx = &dest
+movl %eax, (%ecx)           // *dest = jl
+movl %edx, 4(%ecx)          // *(dest+4) = jh + xh*y + (y >> 31)*xl
+
+
+x = xh << 32 + xl
+x * y = (xh << 32 + xl) * y
+      = xh*y << 32 + xl *y
+      = xh*y + (xl*y)h
+        +
+        (xl*y)l
+
+x * y = x * ((y >> 31 << 32) + y)
+      = x*(y>>31<<32) + x*y
+      = x*(y>>31) << 32 + x*y
+      = x*(y>>31) << 32 + (xh<<32+xl)*y
+      =>
+      high:  xl*(y>>31) + xh*y + (xl*y)
+      low:   xl*y
