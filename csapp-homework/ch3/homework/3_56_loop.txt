@@ -23,3 +23,9 @@ int loop(int x, int n){
 
     return result;
 }
+
+
+A: x => esi
+   n => ebx
+   result => eax
+   mask => edx
