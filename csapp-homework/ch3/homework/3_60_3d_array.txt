@@ -1,0 +1,15 @@
+A: A[i][j][k] = i*S*T + j*T + k
+B: R = 11; S = 7; T = 9;
+
+movl 8(%ebp), %ecx                 // i => ecx
+movl 12(%ebp), %eax                // j
+leal (%eax, %eax, 8), %eax         // 9*j => eax
+movl %ecx, %edx                    // i => edx
+sall $6, %edx                      // i << 6
+subl %ecx, %edx                    // (i << 6) - 1 = 63*i
+addl %edx, %eax                    // 9*j + 63*i => eax
+addl 16(%ebp), %eax                // 63*i + 9*j + k => eax
+movl A(, %eax, 4), %edx            // store element of A[i][j][k] to edx
+movl 20(%ebp), %eax                // dest
+movl %edx, (%eax)                  // *dest = A[i][j][k]
+movl $2772, %eax                   // size = $2772
