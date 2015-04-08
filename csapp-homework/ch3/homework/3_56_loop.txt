@@ -1,0 +1,25 @@
+// x at %epb+8; n at %ebp + 12
+  movl 8(%ebp), %esi         // fetch xl
+  movl 12(%ebp), %ebx
+  movl $1431655765, %edi
+  movl $-2147483648, %edx
+.L2
+  movl %edx, %eax
+  andl %esi, %eax
+  xorl %eax, %edi
+  movl %ebx, %ecx
+  shrl %cl, %edx
+  testl %edx, %edx
+  jne .L2
+  movl %edi, %eax
+
+
+int loop(int x, int n){
+    int result = 1431655765;
+    int mask;
+    for(mask = -2147483648; mask != 0 ; mask = mask >> n){
+        result ^= x&mask;
+    }
+
+    return result;
+}
