@@ -1,0 +1,57 @@
+A: M = 19
+B: j => %ecx
+   i => %edi
+
+C:
+
+void transpose(int n, int A[n][n]){
+    int* Arow = A;
+    int* Bptr = A;
+
+    for (i = 0; i < n; i++){
+      for (j = 0; j < i; j++){
+          int t = *(A + i*n + j);
+          *(A + i*n + j) = (A+j*n + i);
+          *(A + j*n + i) = t;
+      }
+    }
+
+}
+
+void transpose(int n, int A[n][n]){
+    int* Arow = A;
+    int* Bptr = A;
+
+    for (i = 0; i < n; i++){
+      for (j = 0; j < i; j++){
+          int t = *(A + i*n + j);
+          *(A + i*n + j) = (A+j*n + i);
+          *(A + j*n + i) = t;
+      }
+    }
+}
+
+
+
+
+
+__________________________________________________
+
+
+
+for (j = 0; j < i; j++){
+    int t = A[i][j];
+    A[i][j] = A[j][i];
+    A[j][i] = t;
+}
+
+
+.L3
+  movl (%ebx), %eax               // A[i][j] => ebx
+  movl (%esi, %ecx, 4), %edx      // t => edx
+  movl %eax, (%esi, %ecx, 4)      // 4*j + base
+  addl $1, %ecx                   // j++
+  movl %edx, (%ebx)               // A[j][i] = t
+  addl $76, %ebx                  // A + 19
+  cmpl %edi, %ecx                 //
+  jl .L3
