@@ -1,0 +1,27 @@
+E1: 3*n
+E2: 2*n-1
+
+  // n => ebp + 8,
+  // A => ebp + 12,
+  // j => ebp + 16
+  movl 8(%ebp), %edx              // n => edx
+  leal (%edx, %edx), %eax         // 2n => eax
+  leal -1(%eax), %ecx             // 2n-1 => ecx
+  leal (%eax, %edx), %esi         // 3n => esi
+  movl $0, %eax                   // 0 => eax
+  testl %esi, %esi                //
+  jle .L3                         //
+  leal 0(, %ecx, 4), %ebx         // 4*(2n-1) => ebx
+  movl 16(%ebp), %eax             // j => eax
+  movl 12(%ebp), %edx             // A => edx
+  leal (%edx, %eax, 4), %ecx      // A + 4*j => ecx
+  movl $0, %edx                   // 0 => edx
+  movl $0, %eax                   // 0 => eax
+.L4
+  addl (%ecx), %eax               // eax += *(A+4*j)
+  addl $1, %edx                   // edx += 1
+  addl $ebx, %ecx                 // ecx += 4*(2n-1)
+  cmpl $esi, %edx                 // 3n >= edx
+  jl .L4
+.L3
+
