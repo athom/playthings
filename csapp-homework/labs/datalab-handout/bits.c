@@ -166,7 +166,9 @@ int getByte(int x, int n) {
  *   Rating: 3
  */
 int logicalShift(int x, int n) {
-  return 2;
+    int with_sign_bits_val = x >> n;
+    int mask = ~(1<<31>>n<<1);
+    return with_sign_bits_val & mask;
 }
 /*
  * bitCount - returns count of number of 1's in word
@@ -176,7 +178,22 @@ int logicalShift(int x, int n) {
  *   Rating: 4
  */
 int bitCount(int x) {
-  return 2;
+    int mask = 0x01010101;
+    int v = 0;
+    v += x & mask;
+    v += (x>>1) & mask;
+    v += (x>>2) & mask;
+    v += (x>>3) & mask;
+    v += (x>>4) & mask;
+    v += (x>>5) & mask;
+    v += (x>>6) & mask;
+    v += (x>>7) & mask;
+
+    v += (v>>16);
+    v += (v>>8);
+    v &= 0xFF;
+
+    return v;
 }
 /*
  * bang - Compute !x without using !
