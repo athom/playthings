@@ -1,0 +1,16 @@
+A: 0,4, 0,4
+B: 8
+C:
+up->next->x = up->next->p - up->y
+
+
+
+
+movl 8(%ebp), %edx    // up
+movl 4(%edx), %ecx    // e2.next
+movl (%ecx), %eax     // e2.next->p
+movl (%eax), %eax     // *e2.next->p
+subl (%edx), %eax     // *(e2.next.e1->p) - e2.y
+movl %eax, 4(%ecx)    // eax => up+4)
+
+ *e2.next =  *(e2.next.e1->p) - e2.y
