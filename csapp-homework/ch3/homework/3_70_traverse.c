@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// 3223372036854775807 => 8000 0000 0000 0000
+// 3223372036854775807 => 7FFF FFFF FFFF FFFF
 
 long traverse(tree_ptr tp){
     long result = 0x7FFFFFFF;
