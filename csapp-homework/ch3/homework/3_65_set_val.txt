@@ -1,0 +1,65 @@
+
+A*B = 22
+B => 8
+A => 2
+
+
+ &str2
+---------   -> ebp + 12
+ &str1
+---------   -> ebp + 8
+ return
+---------   -> old esp
+ ebp
+---------   -> ebp ------------------------
+s2.sum
+---------   -> ebp - 4
+s2.prod
+---------   -> ebp - 8
+s1.v = y
+---------  -> esp + 8
+s1.p = x
+---------  -> esp + 4
+&s2.prod
+
+
+
+
+
+
+
+
+
+
+int u
+----------
+short * B
+----------
+int t
+----------
+char * B
+----------
+str2
+
+u = b + 28
+t = b + 8
+
+
+
+
+
+
+int
+-------
+short short
+short short
+short short
+short short
+short short
+short short
+short short
+short short
+short short
+short short
+short short
+------

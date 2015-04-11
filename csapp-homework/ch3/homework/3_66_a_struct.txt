@@ -1,0 +1,61 @@
+A: GNT = 7
+B:
+a_struct{
+  int idx;
+  T x[];
+}
+
+
+
+
+
+---------
+
+---------
+int left
+---------  -> &b_struct
+
+12*16+8 = 200
+
+
+
+typedef a_struct {
+    int idx;
+    int x[6];
+}
+
+
+
+-----------
+idx
+-----------  -> &a_struct
+
+
+Conditions:
+1. 192 < sizeof(a_struct)*CNT <= 196
+2. sizeof(a_struct) = 28
+3. &ap = 28i+bp+4
+
+
+// i = >ebp + 8
+// bp => ebp + 12
+push %ebp
+mov %esp, %ebp
+push %ebx
+mov 0x8(%ebp), %eax               // i => eax
+mov 0xc(%ebp), %ecx               // bp => ecx
+imull 0x1c,%eax, %ebx             // 28i => ebx
+lea 0x0(, %eax, 8), %edx          // 8i => edx
+sub %eax, %edx                    // 7i => edx
+add 0x4(%ecx, %ebx, 1), %edx      // edx += *(28i + bp + 4)
+mov 0xc8(%ecx), %eax              // *(bp+0xc8) => eax  bp->right
+add (%ecx), %eax                  // eax += *bp  bp->left
+mov %eax, 0x8(%ecx, %edx, 4)      // eax =>  bp + 4edx + 8
+pop %ebx
+pop %ebp
+ret
+
+
+4(idx + 7i) + bp + 8
+4idx + 28i + bp + 4 + 4
+4idx + 4 + &ap
