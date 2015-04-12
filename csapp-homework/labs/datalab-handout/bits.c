@@ -203,7 +203,12 @@ int bitCount(int x) {
  *   Rating: 4
  */
 int bang(int x) {
-  return 2;
+    x |= (x >> 16);
+    x |= (x >> 8);
+    x |= (x >> 4);
+    x |= (x >> 2);
+    x |= (x >> 1);
+    return (x & 1) ^ 1;
 }
 /*
  * tmin - return minimum two's complement integer
@@ -212,7 +217,7 @@ int bang(int x) {
  *   Rating: 1
  */
 int tmin(void) {
-  return 2;
+    return 1 << 31;
 }
 /*
  * fitsBits - return 1 if x can be represented as an
@@ -224,7 +229,18 @@ int tmin(void) {
  *   Rating: 2
  */
 int fitsBits(int x, int n) {
-  return 2;
+    // n == 1 =>  tmin = -1; tmax=0
+    // n == 2 =>  tmin = -2; tmax=1
+    // n == 3 =>  tmin = -4; tmax=3
+    // n == 4 =>  tmin = -8; tmax=7
+
+    //int mask = ((x >> 31) << n >> 1);
+    //int high_bits = x ^ mask << 1 >> n;
+    //return !high_bits;
+
+    int high_bits_count = 33 + ~n; // 32-n => 32 - (-~n-1) => 33+(~n)
+    int expected_x = (x << high_bits_count) >> high_bits_count;
+    return !(expected_x ^ x);
 }
 /*
  * divpwr2 - Compute x/(2^n), for 0 <= n <= 30
