@@ -251,7 +251,14 @@ int fitsBits(int x, int n) {
  *   Rating: 2
  */
 int divpwr2(int x, int n) {
-    return 2;
+    // -3   => 1111 1111 1111 1111 1111 1111 1111 1101
+    // -3/2 => 01111 1111 1111 1111 1111 1111 1111 110 => -2
+    // -7   => 1111 1111 1111 1111 1111 1111 1111 1001
+    // -7/2 => 01111 1111 1111 1111 1111 1111 1111 100 => -4
+    int bias = (1<<n) - 1;
+    int signed_mask = x >> 31; // all 1 or all 0;
+    bias = bias & signed_mask;
+    return (x + bias) >> n;
 }
 /*
  * negate - return -x
@@ -261,7 +268,7 @@ int divpwr2(int x, int n) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+    return ~x + 1;
 }
 /*
  * isPositive - return 1 if x > 0, return 0 otherwise
@@ -271,7 +278,8 @@ int negate(int x) {
  *   Rating: 3
  */
 int isPositive(int x) {
-  return 2;
+    int x = x ^ 0;
+    return !(x >> 31)^0;
 }
 /*
  * isLessOrEqual - if x <= y  then return 1, else return 0
