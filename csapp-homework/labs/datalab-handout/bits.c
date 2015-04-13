@@ -290,7 +290,16 @@ int isPositive(int x) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+    // 80 00 00 00, 80 00 00 00  => 1
+    // 80 00 00 00, 70 00 00 00  => 1
+    // 70 00 00 00, 70 00 00 00  => 1
+    // 80 00 00 00, 7F FF FF FF  => 1
+    int is_diff = ((x >> 31) ^ (y >> 31)) & 1;
+    int x_is_minus = (x >> 31)&1;
+    int result = y + ~x+1;
+    int is_y_big_than_x = (result >> 31)&1;
+    int is_x_less_or_euqal_than_y = !is_y_big_than_x;
+    return (x_is_minus & is_diff) | ((!is_diff) & is_x_less_or_euqal_than_y);
 }
 /*
  * ilog2 - return floor(log base 2 of x), where x > 0
