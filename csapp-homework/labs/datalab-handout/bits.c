@@ -315,41 +315,36 @@ int ilog2(int x) {
     x |= x >> 8;
     x |= x >> 16;
 
-    int y = 0;
-    y += (x&1);
-    y += ((x>>1)&1);
-    y += ((x>>2)&1);
-    y += ((x>>3)&1);
-    y += ((x>>4)&1);
-    y += ((x>>5)&1);
-    y += ((x>>6)&1);
-    y += ((x>>7)&1);
-    y += ((x>>8)&1);
-    y += ((x>>9)&1);
-    y += ((x>>10)&1);
-    y += ((x>>11)&1);
-    y += ((x>>12)&1);
-    y += ((x>>13)&1);
-    y += ((x>>14)&1);
-    y += ((x>>15)&1);
-    y += ((x>>16)&1);
-    y += ((x>>17)&1);
-    y += ((x>>18)&1);
-    y += ((x>>19)&1);
-    y += ((x>>20)&1);
-    y += ((x>>21)&1);
-    y += ((x>>22)&1);
-    y += ((x>>23)&1);
-    y += ((x>>24)&1);
-    y += ((x>>25)&1);
-    y += ((x>>26)&1);
-    y += ((x>>27)&1);
-    y += ((x>>28)&1);
-    y += ((x>>29)&1);
-    y += ((x>>30)&1);
-    y += ((x>>31)&1);
+    // 0x55 55 55 55
+    int mask1 = 0x55;
+    mask1 |= mask1 << 8;
+    mask1 |= mask1 << 16;
 
-    return y  + (~0);
+    // 0x33 33 33 33
+    int mask2 = 0x33;
+    mask2 |= mask2 << 8;
+    mask2 |= mask2 << 16;
+
+    // 0x0F 0F 0F 0F
+    int mask3 = 0x0F;
+    mask3 |= mask3 << 8;
+    mask3 |= mask3 << 16;
+
+    // 0x00 FF 00 FF
+    int mask4 = 0xFF;
+    mask4 |= mask4 << 16;
+
+    // 0x00 00 FF FF
+    int mask5 = 0xFF;
+    mask5 |= mask5 << 8;
+
+
+    x = (x & mask1) + ((x >> 1) & mask1);
+    x = (x & mask2) + ((x >> 2) & mask2);
+    x = (x & mask3) + ((x >> 4) & mask3);
+    x = (x & mask4) + ((x >> 8) & mask4);
+    x = (x & mask5) + ((x >> 16) & mask5);
+    return x + ~0;
 }
 /*
  * float_neg - Return bit-level equivalent of expression -f for
