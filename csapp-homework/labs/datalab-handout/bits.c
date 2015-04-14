@@ -358,7 +358,27 @@ int ilog2(int x) {
  *   Rating: 2
  */
 unsigned float_neg(unsigned uf) {
- return 2;
+    // 0x7fc00000
+    // 0111 1111 1100 0000 0000 0000 0000 0000
+    //
+    // 0111 1111 1000 0000 0000 0000 0000 0000 // mask
+    //
+    // 0000 0000 0000 0000 0000 0000 0000 0000 // +0
+    // 1000 0000 0000 0000 0000 0000 0000 0000 // -0
+    // 0111 1111 1000 0000 0000 0000 0000 0000 // +INF
+    // 1111 1111 1000 0000 0000 0000 0000 0000 // -INF
+    // 0x7F800000
+    // 0xFF << 29
+    //uf = 0x7fc00000;
+
+    int signed_mask = 1 << 31;              // 0x1000 0000
+    int nan_mask = 0xFF << 23;              // 0111 1111 1000 0000 0000 0000 0000 0000
+    int exp = !((nan_mask ^ uf)<<1>>24);    // 1 if INF or NAN
+    int f = !!(((~nan_mask) & uf) << 9);    // 1 if NAN
+
+    int nan_bit = (exp&f) << 31;            // 0x8000 0000 if NAN
+    int mask = nan_bit ^ signed_mask;       // 0x0000 0000 for NAN and 0 for others
+    return uf ^ mask;
 }
 /*
  * float_i2f - Return bit-level equivalent of expression (float) x
