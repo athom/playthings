@@ -315,7 +315,6 @@ int ilog2(int x) {
     x |= x >> 8;
     x |= x >> 16;
 
-    x = ~x;
     int y = 0;
     y += (x&1);
     y += ((x>>1)&1);
@@ -350,7 +349,7 @@ int ilog2(int x) {
     y += ((x>>30)&1);
     y += ((x>>31)&1);
 
-    return 32 + ~y;
+    return y  + (~0);
 }
 /*
  * float_neg - Return bit-level equivalent of expression -f for
