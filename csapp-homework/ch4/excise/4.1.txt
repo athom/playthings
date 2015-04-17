@@ -1,0 +1,7 @@
+            .pos 0x100
+0x100         irmovl $15, %ebx              // 0x30F30F000000
+0x106         rrmovl %ebx, %ecx             // 0x2031
+            .loop
+0x108         rmmovl %ecx, -3(%ebx)         // 0x4013FDFFFFFF
+0x10E         addl %ebx, %ecx               // 0x6031
+0x110         jmp .loop                     // 0x7008010000
