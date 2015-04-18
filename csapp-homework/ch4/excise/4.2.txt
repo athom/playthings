@@ -1,0 +1,39 @@
+A:
+  0x100:  30f3fcffffff  40630008000000
+
+  irmovl $-4, %ebx
+  rmmovl %esi, $128(%ebx)
+  halt
+
+B:
+  0x200: a06f 8008020000 00 30f30a000000 90
+
+  pushl $esi
+  call  0x000000208
+  halt
+  irmovl $10, $ebx
+  ret
+
+C:
+  0x300: 505407000000 10f0 b01f
+
+  mrmovl $7(%ebp), %esp
+  nop
+  invalid instruction
+  popl &ecx
+
+
+D:
+  0x400: 6113 7300040000 00
+
+  subl %ebx, %edi
+  je D
+  halt
+
+E:
+  0x500: 6362a0f0
+
+  xorl %esi, %edx
+  invalid struction
+
+
