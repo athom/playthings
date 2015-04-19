@@ -1,0 +1,30 @@
+Sum:
+  pushl %ebp
+  rrmovl %esp, %ebp
+  mrmovl 8(%ebp), %ecx
+  mrmovl 12(%ebp), %edx
+  xorl %eax, %eax
+  andl %edx, %edx
+  je End
+Loop:
+  mrmovl (%ecx), %esi
+
+  irmovl 0x80000000, %edi
+  andl %esi, %edi
+  je .Positive
+  movl 0xFFFFFFFF, %edi
+  xorl %edi, %esi  // ~Start[i]
+  addl $1, %esi
+
+.Positive
+  andl %esi, %eax
+  irmovl $4, %ebx
+  addl %ebx, %ecx
+  irmovl $-1, %ebx
+  addl %ebx, %edx
+  jne .Loop
+End:
+  rrmovl %ebx, %esp
+  popl %ebp
+  ret
+
