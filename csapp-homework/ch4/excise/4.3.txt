@@ -1,0 +1,71 @@
+        .file   "rsum.c"
+        .text
+        .globl  rSum
+        .type   rSum, @function
+rSum:
+.LFB0:
+        pushl   %ebp
+        movl    %esp, %ebp
+        pushl   %ebx
+        subl    $20, %esp
+        cmpl    $0, 12(%ebp)
+        jle     .L2
+        movl    $0, %eax
+        jmp     .L3
+.L2:
+        movl    8(%ebp), %eax
+        movl    (%eax), %ebx
+        movl    12(%ebp), %eax
+        leal    -1(%eax), %edx
+        movl    8(%ebp), %eax
+        addl    $4, %eax
+        movl    %edx, 4(%esp)
+        movl    %eax, (%esp)
+        call    rSum
+        addl    %ebx, %eax
+.L3:
+        addl    $20, %esp
+        popl    %ebx
+        popl    %ebp
+        ret
+.LFE0:
+        .size   rSum, .-rSum
+        .ident  "GCC: (Ubuntu/Linaro 4.6.3-1ubuntu5) 4.6.3"
+        .section        .note.GNU-stack,"",@progbits
+
+
+-----------------------
+
+
+rSum:
+        pushl   %ebp
+        rrmovl  %esp, %ebp
+        pushl   %ebx
+        irmovl $20, %eax
+        subl    %eax, %esp
+        mrmovl  12(%ebp), %edx
+        andl    %edx, %edx
+        jle     .L2
+
+        irmovl  $0, %eax
+        jmp     .L3
+.L2:
+        mrmovl  8(%ebp), %eax
+        mrmovl  (%eax), %ebx
+        mrmovl  12(%ebp), %eax
+        rrmovl  %eax, %edx
+        irmovl   $1, %ecx
+        subl    %ecx, %edx
+        mrmovl  8(%ebp), %eax
+        irmovl   $4, %ecx
+        addl    %ecx, %eax
+        rmmovl  %edx, 4(%esp)
+        rmmovl  %eax, (%esp)
+        call    rSum
+        addl    %ebx, %eax
+.L3:
+        irmovl  $20, %ecx
+        addl    %ecx, %esp
+        popl    %ebx
+        popl    %ebp
+        ret
