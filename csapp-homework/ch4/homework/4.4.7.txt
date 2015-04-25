@@ -1,0 +1,20 @@
+F:
+  icode:ifun <- M1[PC]
+  valP <- PC+1
+
+D:
+  valA <- R[%ebp]
+  valB <- R[%esp]
+
+E:
+  valE <- valA + 4
+
+M:
+  valM <- M4[valA]
+
+W:
+  R[%ebp] <- valM
+  R[%esp] <- valE
+
+B:
+  PC <- valP
