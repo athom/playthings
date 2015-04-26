@@ -711,20 +711,20 @@ Disassembly of section .text:
  8048ea0:	85 d2                	test   %edx,%edx
  8048ea2:	75 0c                	jne    8048eb0 <fun7+0x1c>
  8048ea4:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
- 8048ea9:	eb 37                	jmp    8048ee2 <fun7+0x4e>
+ 8048ea9:	eb 37                	jmp    8048ee2 <fun7+0x4e> // no change game over
  8048eab:	90                   	nop
- 8048eac:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+ 8048eac:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi //nop
  8048eb0:	3b 02                	cmp    (%edx),%eax
- 8048eb2:	7d 11                	jge    8048ec5 <fun7+0x31>
+ 8048eb2:	7d 11                	jge    8048ec5 <fun7+0x31> // game over, even number, not 7
  8048eb4:	83 c4 f8             	add    $0xfffffff8,%esp
  8048eb7:	50                   	push   %eax
  8048eb8:	8b 42 04             	mov    0x4(%edx),%eax
  8048ebb:	50                   	push   %eax
  8048ebc:	e8 d3 ff ff ff       	call   8048e94 <fun7>
  8048ec1:	01 c0                	add    %eax,%eax
- 8048ec3:	eb 1d                	jmp    8048ee2 <fun7+0x4e>
+ 8048ec3:	eb 1d                	jmp    8048ee2 <fun7+0x4e> // no change
  8048ec5:	3b 02                	cmp    (%edx),%eax
- 8048ec7:	74 17                	je     8048ee0 <fun7+0x4c>
+ 8048ec7:	74 17                	je     8048ee0 <fun7+0x4c> // game over, not euqal 7
  8048ec9:	83 c4 f8             	add    $0xfffffff8,%esp
  8048ecc:	50                   	push   %eax
  8048ecd:	8b 42 08             	mov    0x8(%edx),%eax
@@ -732,7 +732,7 @@ Disassembly of section .text:
  8048ed1:	e8 be ff ff ff       	call   8048e94 <fun7>
  8048ed6:	01 c0                	add    %eax,%eax
  8048ed8:	40                   	inc    %eax
- 8048ed9:	eb 07                	jmp    8048ee2 <fun7+0x4e>
+ 8048ed9:	eb 07                	jmp    8048ee2 <fun7+0x4e> // <--
  8048edb:	90                   	nop
  8048edc:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
  8048ee0:	31 c0                	xor    %eax,%eax
@@ -1335,7 +1335,7 @@ Disassembly of section .text:
  8049556:	83 f8 02             	cmp    $0x2,%eax
  8049559:	75 37                	jne    8049592 <phase_defused+0x66>
  804955b:	83 c4 f8             	add    $0xfffffff8,%esp
- 804955e:	68 09 9d 04 08       	push   $0x8049d09
+ 804955e:	68 09 9d 04 08       	push   $0x8049d09          // austinpowers
  8049563:	53                   	push   %ebx
  8049564:	e8 c7 fa ff ff       	call   8049030 <strings_not_equal>
  8049569:	83 c4 10             	add    $0x10,%esp
