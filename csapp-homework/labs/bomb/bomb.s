@@ -625,51 +625,51 @@ Disassembly of section .text:
  8048db8:	31 ff                	xor    %edi,%edi
  8048dba:	83 c4 10             	add    $0x10,%esp
  8048dbd:	8d 76 00             	lea    0x0(%esi),%esi
- 8048dc0:	8d 45 e8             	lea    -0x18(%ebp),%eax
- 8048dc3:	8b 04 b8             	mov    (%eax,%edi,4),%eax
- 8048dc6:	48                   	dec    %eax
- 8048dc7:	83 f8 05             	cmp    $0x5,%eax
- 8048dca:	76 05                	jbe    8048dd1 <phase_6+0x39>
+ 8048dc0:	8d 45 e8             	lea    -0x18(%ebp),%eax   // src
+ 8048dc3:	8b 04 b8             	mov    (%eax,%edi,4),%eax // src[j]
+ 8048dc6:	48                   	dec    %eax               // d = src[j] - 1
+ 8048dc7:	83 f8 05             	cmp    $0x5,%eax          // 5 vs src[j] - 1
+ 8048dca:	76 05                	jbe    8048dd1 <phase_6+0x39> // src[j] must not be bigger than 6
  8048dcc:	e8 2b 07 00 00       	call   80494fc <explode_bomb>
- 8048dd1:	8d 5f 01             	lea    0x1(%edi),%ebx
- 8048dd4:	83 fb 05             	cmp    $0x5,%ebx
- 8048dd7:	7f 23                	jg     8048dfc <phase_6+0x64>
- 8048dd9:	8d 04 bd 00 00 00 00 	lea    0x0(,%edi,4),%eax
- 8048de0:	89 45 c8             	mov    %eax,-0x38(%ebp)
+ 8048dd1:	8d 5f 01             	lea    0x1(%edi),%ebx         // i = j + 1
+ 8048dd4:	83 fb 05             	cmp    $0x5,%ebx          // i <=> 5
+ 8048dd7:	7f 23                	jg     8048dfc <phase_6+0x64>  // while i <= 5
+ 8048dd9:	8d 04 bd 00 00 00 00 	lea    0x0(,%edi,4),%eax  //
+ 8048de0:	89 45 c8             	mov    %eax,-0x38(%ebp)   //
  8048de3:	8d 75 e8             	lea    -0x18(%ebp),%esi
- 8048de6:	8b 55 c8             	mov    -0x38(%ebp),%edx
- 8048de9:	8b 04 32             	mov    (%edx,%esi,1),%eax // src + offset
- 8048dec:	3b 04 9e             	cmp    (%esi,%ebx,4),%eax // src + i
+ 8048de6:	8b 55 c8             	mov    -0x38(%ebp),%edx   // 4j
+ 8048de9:	8b 04 32             	mov    (%edx,%esi,1),%eax // src + 4j
+ 8048dec:	3b 04 9e             	cmp    (%esi,%ebx,4),%eax // src[i] vs src[j]
  8048def:	75 05                	jne    8048df6 <phase_6+0x5e>
- 8048df1:	e8 06 07 00 00       	call   80494fc <explode_bomb>
- 8048df6:	43                   	inc    %ebx
+ 8048df1:	e8 06 07 00 00       	call   80494fc <explode_bomb> // make sure src[i] != src[j], and all src element are different
+ 8048df6:	43                   	inc    %ebx                   // i++
  8048df7:	83 fb 05             	cmp    $0x5,%ebx
- 8048dfa:	7e ea                	jle    8048de6 <phase_6+0x4e>
- 8048dfc:	47                   	inc    %edi
- 8048dfd:	83 ff 05             	cmp    $0x5,%edi
- 8048e00:	7e be                	jle    8048dc0 <phase_6+0x28>
+ 8048dfa:	7e ea                	jle    8048de6 <phase_6+0x4e> // }
+ 8048dfc:	47                   	inc    %edi                   // j++
+ 8048dfd:	83 ff 05             	cmp    $0x5,%edi              // } j <= 5
+ 8048e00:	7e be                	jle    8048dc0 <phase_6+0x28> // while j <= 5 // seems the above code are validation only
  8048e02:	31 ff                	xor    %edi,%edi
- 8048e04:	8d 4d e8             	lea    -0x18(%ebp),%ecx
- 8048e07:	8d 45 d0             	lea    -0x30(%ebp),%eax
- 8048e0a:	89 45 c4             	mov    %eax,-0x3c(%ebp)
- 8048e0d:	8d 76 00             	lea    0x0(%esi),%esi
- 8048e10:	8b 75 cc             	mov    -0x34(%ebp),%esi
- 8048e13:	bb 01 00 00 00       	mov    $0x1,%ebx
- 8048e18:	8d 04 bd 00 00 00 00 	lea    0x0(,%edi,4),%eax
- 8048e1f:	89 c2                	mov    %eax,%edx
- 8048e21:	3b 1c 08             	cmp    (%eax,%ecx,1),%ebx
- 8048e24:	7d 12                	jge    8048e38 <phase_6+0xa0>
- 8048e26:	8b 04 0a             	mov    (%edx,%ecx,1),%eax
- 8048e29:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
- 8048e30:	8b 76 08             	mov    0x8(%esi),%esi
- 8048e33:	43                   	inc    %ebx
- 8048e34:	39 c3                	cmp    %eax,%ebx
- 8048e36:	7c f8                	jl     8048e30 <phase_6+0x98>
- 8048e38:	8b 55 c4             	mov    -0x3c(%ebp),%edx
- 8048e3b:	89 34 ba             	mov    %esi,(%edx,%edi,4)
- 8048e3e:	47                   	inc    %edi
+ 8048e04:	8d 4d e8             	lea    -0x18(%ebp),%ecx   // src
+ 8048e07:	8d 45 d0             	lea    -0x30(%ebp),%eax   // des
+ 8048e0a:	89 45 c4             	mov    %eax,-0x3c(%ebp)   // store &des at des - 12
+ 8048e0d:	8d 76 00             	lea    0x0(%esi),%esi     // nop
+ 8048e10:	8b 75 cc             	mov    -0x34(%ebp),%esi   // do { link  = tail;
+ 8048e13:	bb 01 00 00 00       	mov    $0x1,%ebx          //
+ 8048e18:	8d 04 bd 00 00 00 00 	lea    0x0(,%edi,4),%eax  // i -> eax
+ 8048e1f:	89 c2                	mov    %eax,%edx          // i
+ 8048e21:	3b 1c 08             	cmp    (%eax,%ecx,1),%ebx // src + i  vs  1
+ 8048e24:	7d 12                	jge    8048e38 <phase_6+0xa0> // if src[i] > 1
+ 8048e26:	8b 04 0a             	mov    (%edx,%ecx,1),%eax  // src[i]
+ 8048e29:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi // nop
+ 8048e30:	8b 76 08             	mov    0x8(%esi),%esi     //    do { link = link->next
+ 8048e33:	43                   	inc    %ebx                    // count++
+ 8048e34:	39 c3                	cmp    %eax,%ebx              //
+ 8048e36:	7c f8                	jl     8048e30 <phase_6+0x98> // } while(src[i] > count )
+ 8048e38:	8b 55 c4             	mov    -0x3c(%ebp),%edx     // src[i] <= 1    edx <- 6a8
+ 8048e3b:	89 34 ba             	mov    %esi,(%edx,%edi,4)   //
+ 8048e3e:	47                   	inc    %edi                 // i++
  8048e3f:	83 ff 05             	cmp    $0x5,%edi
- 8048e42:	7e cc                	jle    8048e10 <phase_6+0x78>
+ 8048e42:	7e cc                	jle    8048e10 <phase_6+0x78> //} while(i <= 5)
  8048e44:	8b 75 d0             	mov    -0x30(%ebp),%esi
  8048e47:	89 75 cc             	mov    %esi,-0x34(%ebp)
  8048e4a:	bf 01 00 00 00       	mov    $0x1,%edi
@@ -683,7 +683,7 @@ Disassembly of section .text:
  8048e60:	c7 46 08 00 00 00 00 	movl   $0x0,0x8(%esi)
  8048e67:	8b 75 cc             	mov    -0x34(%ebp),%esi
  8048e6a:	31 ff                	xor    %edi,%edi
- 8048e6c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+ 8048e6c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi // nop
  8048e70:	8b 56 08             	mov    0x8(%esi),%edx
  8048e73:	8b 06                	mov    (%esi),%eax
  8048e75:	3b 02                	cmp    (%edx),%eax
