@@ -1,0 +1,15 @@
+
+nitroglycerin.o:     file format mach-o-i386
+
+
+Disassembly of section .text:
+
+00000000 <.text>:
+   0:	31 db                	xor    %ebx,%ebx
+   2:	89 e3                	mov    %esp,%ebx
+   4:	83 c3 28             	add    $0x28,%ebx
+   7:	89 dd                	mov    %ebx,%ebp
+   9:	b8 d1 aa f4 63       	mov    $0x63f4aad1,%eax
+   e:	bb 3a 8e 04 08       	mov    $0x8048e3a,%ebx
+  13:	53                   	push   %ebx
+  14:	c3                   	ret
