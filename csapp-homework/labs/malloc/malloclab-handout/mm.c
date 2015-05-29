@@ -319,7 +319,6 @@ void *mm_realloc(void *ptr, size_t size)
     if (newptr == NULL)
       return NULL;
     copySize = GET_SIZE(HDRP(oldptr)) - WSIZE;
-    //copySize = *(size_t *)((char *)oldptr - SIZE_T_SIZE);
     if (size < copySize)
       copySize = size;
     memcpy(newptr, oldptr, copySize);
