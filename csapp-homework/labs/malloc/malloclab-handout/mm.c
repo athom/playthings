@@ -71,6 +71,7 @@ static char* mm_heap_start;
 static char* mm_heap_end;
 
 static int mm_check(char, void*, size_t);
+static size_t mm_new_size(size_t size);
 
 /*
  * coalesce - merge free memory
@@ -232,6 +233,17 @@ static void place(void* p, size_t size)
         PUT(FTRP(p), PACK(oldsize, 1));
     }
 }
+/*
+ * mm_new_size - Cauculate new block size from the size
+ */
+static size_t mm_new_size(size_t size)
+{
+    if (size <= DSIZE)
+    {
+        return 2*DSIZE;
+    }
+    return ALIGN(size + SIZE_T_SIZE);
+}
 
 /*
  * mm_malloc - Allocate a block by incrementing the brk pointer.
@@ -248,14 +260,7 @@ void *mm_malloc(size_t size)
         return NULL;
     }
 
-    if (size <= DSIZE)
-    {
-        newsize = 2*DSIZE;
-    }else
-    {
-        //newsize = DSIZE*((size + (DSIZE) + DSIZE -1)/DSIZE);
-        newsize = ALIGN(size + SIZE_T_SIZE);
-    }
+    newsize = mm_new_size(size);
 
     extendsize = MAX(newsize, CHUNKSIZE);
     //printf("newsize: %u,    extendsize: %u      chunksize: %u \n", newsize, extendsize, CHUNKSIZE);
@@ -315,10 +320,16 @@ void *mm_realloc(void *ptr, size_t size)
     void *newptr;
     size_t copySize;
 
+    copySize = GET_SIZE(HDRP(oldptr)) - WSIZE;
+    if (size < copySize)
+    {
+
+    }
+
     newptr = mm_malloc(size);
     if (newptr == NULL)
       return NULL;
-    copySize = GET_SIZE(HDRP(oldptr)) - WSIZE;
+
     if (size < copySize)
       copySize = size;
     memcpy(newptr, oldptr, copySize);
