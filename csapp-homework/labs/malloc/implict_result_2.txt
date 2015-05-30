@@ -1,0 +1,18 @@
+Results for mm malloc:  implicit list    next search argorithm
+trace  valid  util     ops      secs  Kops
+ 0       yes   92%    5694  0.007546   755
+ 1       yes   95%    5848  0.006933   844
+ 2       yes   98%    6648  0.013557   490
+ 3       yes   98%    5380  0.011785   457
+ 4       yes   66%   14400  0.000585 24599
+ 5       yes   92%    4800  0.013353   359
+ 6       yes   91%    4800  0.013667   351
+ 7       yes   55%   12000  0.018166   661
+ 8       yes   51%   24000  0.013518  1775
+ 9       yes   27%   14401  0.103684   139
+10       yes   25%   14401  0.002092  6884
+Total          72%  112372  0.204886   548
+
+Perf index = 43 (util) + 37 (thru) = 80/100
+correct:11
+perfidx:80

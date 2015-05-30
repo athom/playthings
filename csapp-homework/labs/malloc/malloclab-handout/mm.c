@@ -18,6 +18,9 @@
 #include "mm.h"
 #include "memlib.h"
 
+
+//#define USE_NEXT_SEARCH 1
+
 /*********************************************************
  * NOTE TO STUDENTS: Before you do anything else, please
  * provide your team information in the following struct.
@@ -68,7 +71,7 @@ team_t team = {
 
 /* vars and funcs */
 static char* mm_heap_start;
-static char* mm_heap_end;
+static char* mm_next_visit_ptr;
 
 static int mm_check(char, void*, size_t);
 static size_t mm_new_size(size_t size);
@@ -78,7 +81,6 @@ static size_t mm_new_size(size_t size);
  */
 static void* coalesce(char* bp)
 {
-    //size_t prev_alloc = GET_ALLOC(FTRP(PREV_BLKP(bp)));
     size_t prev_alloc = GET_ALLOC(bp-DSIZE);
     size_t next_alloc = GET_ALLOC(HDRP(NEXT_BLKP(bp)));
     size_t size = GET_SIZE(HDRP(bp));
@@ -90,38 +92,55 @@ static void* coalesce(char* bp)
 
     if (!prev_alloc && next_alloc)
     {
-        void* prev_blk = PREV_BLKP(bp);
-        void* prev_blk_head = HDRP(prev_blk);
-        unsigned int raw = *((unsigned int*)prev_blk_head);
-        size_t prev_size = GET_SIZE(HDRP(PREV_BLKP(bp)));
+
+#ifdef  USE_NEXT_SEARCH
+        if (bp == mm_next_visit_ptr)
+        {
+            mm_next_visit_ptr = PREV_BLKP(bp);
+        }
+#endif
+
         size += GET_SIZE(HDRP(PREV_BLKP(bp)));
         PUT(FTRP(bp),               PACK(size,0));
-        PUT(HDRP(PREV_BLKP(bp)),    PACK(size,0));
         bp = PREV_BLKP(bp);
-        //printf("coalesce ptr: %x     size: %u   pre size:%u prev block: %x head:%x raw:%x\n", bp, size, prev_size, prev_blk, prev_blk_head, raw);
+        PUT(HDRP(bp),    PACK(size,0));
         return bp;
     }
 
     if (prev_alloc && !next_alloc)
     {
+#ifdef  USE_NEXT_SEARCH
+        if (NEXT_BLKP(bp) == mm_next_visit_ptr)
+        {
+            mm_next_visit_ptr = bp;
+        }
+#endif
+
         size += GET_SIZE(HDRP(NEXT_BLKP(bp)));
-        PUT(HDRP(bp),               PACK(size,0));
-        PUT(FTRP(bp),    PACK(size,0));
-        // NOTE should not use the below code
-        //PUT(FTRP(NEXT_BLKP(bp)),    PACK(size,0));
+        PUT(HDRP(bp),   PACK(size,0));
+        PUT(FTRP(bp),   PACK(size,0));
         return bp;
 
     }
 
     if (!prev_alloc && !next_alloc)
     {
-        size += GET_SIZE(HDRP(PREV_BLKP(bp)));
-        //size += GET_SIZE(HDRP(NEXT_BLKP(bp)));
-        size += GET_SIZE(FTRP(NEXT_BLKP(bp)));
+#ifdef  USE_NEXT_SEARCH
+        if (NEXT_BLKP(bp) == mm_next_visit_ptr || bp == mm_next_visit_ptr)
+        {
+            mm_next_visit_ptr = PREV_BLKP(bp);
+        }
+#endif
 
+        size += GET_SIZE(HDRP(PREV_BLKP(bp)));
+        size += GET_SIZE(HDRP(NEXT_BLKP(bp)));
+        //size += GET_SIZE(FTRP(NEXT_BLKP(bp)));
         PUT(HDRP(PREV_BLKP(bp)),    PACK(size,0));
         PUT(FTRP(NEXT_BLKP(bp)),    PACK(size,0));
+
+
         bp = PREV_BLKP(bp);
+
         return bp;
     }
 
@@ -142,16 +161,14 @@ static void* extend_heap(size_t words)
         return NULL;
     }
 
-    mm_heap_end = HDRP(NEXT_BLKP(bp));
     PUT(HDRP(bp), PACK(size, 0));
     PUT(FTRP(bp), PACK(size, 0));
     PUT(HDRP(NEXT_BLKP(bp)), PACK(0, 1));
 
-    //printf("old p:  %x\n", bp);
+    //mm_check('c', bp, 1);
     bp = coalesce(bp);
-    //printf("new p:  %x\n", bp);
+    //mm_check('C', bp, 1);
     return bp;
-    //return coalesce(bp);
 }
 
 
@@ -172,12 +189,12 @@ int mm_init(void)
     PUT(bp+(3*WSIZE), PACK(0, 1));
     mm_heap_start += 4*WSIZE;
 
-    mm_check('b', mm_heap_start, 1);
+    //mm_check('b', mm_heap_start, 1);
     if (extend_heap(CHUNKSIZE/WSIZE) == NULL)
     {
         return -1;
     }
-    mm_check('i', mm_heap_start, 1);
+    //mm_check('i', mm_heap_start, 1);
 
 
     return 0;
@@ -199,10 +216,22 @@ static int is_epilogue(char* p)
  *  find_fit search the proper block for alloc
  */
 static void *find_fit(size_t size){
-    void* p = mm_heap_start;
+    void* p;
+#ifdef  USE_NEXT_SEARCH
+    if (mm_next_visit_ptr != NULL)
+    {
+        p = mm_next_visit_ptr;
+        mm_next_visit_ptr = NULL;
+        if (!GET_ALLOC(HDRP(p)) && GET_SIZE(HDRP(p)) >= size)
+        {
+            return p;
+        }
+    }
+#endif
+
+    p = mm_heap_start;
     for (; !is_epilogue(p); p = NEXT_BLKP(p))
     {
-            //printf("bp:%x   alloc:%d  head size:%u    size:%u \n", p, GET_ALLOC(HDRP(p)), GET_SIZE(HDRP(p)), size );
         if (!GET_ALLOC(HDRP(p)) && GET_SIZE(HDRP(p)) >= size)
         {
             return p;
@@ -225,13 +254,16 @@ static void place(void* p, size_t size)
         PUT(HDRP(rest_blk), PACK(rest_size, 0));
         PUT(FTRP(rest_blk), PACK(rest_size, 0));
 
-        //printf("ptr: %x     rest size: %u       %u\n", rest_blk, rest_size, GET_SIZE(HDRP(NEXT_BLKP(p))));
 
     }else
     {
         PUT(HDRP(p), PACK(oldsize, 1));
         PUT(FTRP(p), PACK(oldsize, 1));
     }
+
+#ifdef  USE_NEXT_SEARCH
+    mm_next_visit_ptr = NEXT_BLKP(p);
+#endif
 }
 /*
  * mm_new_size - Cauculate new block size from the size
@@ -263,14 +295,13 @@ void *mm_malloc(size_t size)
     newsize = mm_new_size(size);
 
     extendsize = MAX(newsize, CHUNKSIZE);
-    //printf("newsize: %u,    extendsize: %u      chunksize: %u \n", newsize, extendsize, CHUNKSIZE);
 
     bp = find_fit(newsize);
     if (bp != NULL)
     {
         mm_check('a', bp, 1);
         place(bp, newsize);
-        mm_check('A', bp, 1);
+        //mm_check('A', bp, 1);
         return bp;
     }
 
@@ -282,9 +313,9 @@ void *mm_malloc(size_t size)
        return NULL;
     }
 
-    mm_check('e', bp, 1);
+    //mm_check('e', bp, 1);
     place(bp, newsize);
-    mm_check('E', bp, 1);
+    //mm_check('E', bp, 1);
     return bp;
 }
 
@@ -293,12 +324,12 @@ void *mm_malloc(size_t size)
  */
 void mm_free(void *ptr)
 {
+    //mm_check('f', ptr, 1);
     size_t size = GET_SIZE(HDRP(ptr));
     PUT(HDRP(ptr), PACK(size, 0));
     PUT(FTRP(ptr), PACK(size, 0));
-    mm_check('f', ptr, 1);
     coalesce(ptr);
-    mm_check('F', ptr, 1);
+    //mm_check('F', ptr, 1);
 }
 
 /*
@@ -318,14 +349,12 @@ void *mm_realloc(void *ptr, size_t size)
 
     void *oldptr = ptr;
     void *newptr;
-    size_t copySize;
 
     size_t newsize = mm_new_size(size);
     size_t oldsize = GET_SIZE(HDRP(oldptr));
     if (newsize <= oldsize)
     {
         place(oldptr, newsize);
-        //size_t rest_size = oldsize - newsize;
         return oldptr;
     }
 
@@ -339,23 +368,6 @@ void *mm_realloc(void *ptr, size_t size)
     return newptr;
 }
 
-//void *mm_realloc(void *ptr, size_t size)
-//{
-    //void *oldptr = ptr;
-    //void *newptr;
-    //size_t copySize;
-
-    //newptr = mm_malloc(size);
-    //if (newptr == NULL)
-      //return NULL;
-    //copySize = *(size_t *)((char *)oldptr - SIZE_T_SIZE);
-    //if (size < copySize)
-      //copySize = size;
-    //memcpy(newptr, oldptr, copySize);
-    //mm_free(oldptr);
-    //return newptr;
-//}
-
 
 /*
  * mm_check - Implement the heap checker for debug
@@ -363,30 +375,27 @@ void *mm_realloc(void *ptr, size_t size)
 static int mm_check(char action, void* p, size_t size)
 {
     return 0;
+    void* prev_p = PREV_BLKP(p);
+    void* next_p = NEXT_BLKP(p);
 
-    unsigned int head;
-    head = *((unsigned int*)(HDRP(p)));
-    size_t sz = GET_SIZE(HDRP(p));
-    int is_alloc = GET_ALLOC(HDRP(p));
-
-    void* last_block = mem_heap_hi()-3;
-    //void* last_block = mm_heap_end;
-    unsigned int raw_header = *((unsigned int*)HDRP(last_block));
-    size_t last_sz = GET_SIZE(HDRP(last_block));
-
-    //printf("current pointer: %x\n", p);
-    //printf("current head: %x\n", head);
-    //printf("%c    ptr:%-8x    size:%-8u     %-8x  last:%-8x     alloc:%-2d \n", action, p, sz, sz, last_block, is_alloc);
-    printf("%c    %-8x    %-8u     %-8x  %-8x %-8x  %-8u     %-2d \n", action, p, sz, sz, last_block, raw_header, last_sz, is_alloc);
+    if (mm_next_visit_ptr != NULL)
+    {
+#ifdef  USE_NEXT_SEARCH
+        void* mp = mm_next_visit_ptr;
+        printf("%c    prev_p:%-8p %-8u %-2d    cur_p:%-8p %-8u %-2d next_p:%-8p %-8u %-2d mm_p:%-8p %-8u %-2d\n",
+                action,
+                prev_p, GET_SIZE(HDRP(prev_p)), GET_ALLOC(HDRP(prev_p)),
+                p, GET_SIZE(HDRP(p)), GET_ALLOC(HDRP(p)),
+                next_p, GET_SIZE(HDRP(next_p)), GET_ALLOC(HDRP(next_p)),
+                mp, GET_SIZE(HDRP(mp)), GET_ALLOC(HDRP(mp)));
+#endif
+    }else{
+        printf("%c    prev_p:%-8p %-8u %-2d    cur_p:%-8p %-8u %-2d next_p:%-8p %-8u %-2d \n",
+                action,
+                prev_p, GET_SIZE(HDRP(prev_p)), GET_ALLOC(HDRP(prev_p)),
+                p, GET_SIZE(HDRP(p)), GET_ALLOC(HDRP(p)),
+                next_p, GET_SIZE(HDRP(next_p)), GET_ALLOC(HDRP(next_p)));
+    }
 
     return 0;
 }
-
-
-
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-Results for mm malloc:
+Results for mm malloc:  implicit list    first search argorithm
 trace  valid  util     ops      secs  Kops
  0       yes   99%    5694  0.007390   770
  1       yes   99%    5848  0.006333   923
