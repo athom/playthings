@@ -19,7 +19,7 @@
 #include "memlib.h"
 
 
-//#define USE_NEXT_SEARCH 1
+#define USE_NEXT_SEARCH 1
 
 /*********************************************************
  * NOTE TO STUDENTS: Before you do anything else, please
