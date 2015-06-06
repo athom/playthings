@@ -1,2 +1,3 @@
 *.out
 *.o
+./csapp-homework/labs/shelllab/tsh
