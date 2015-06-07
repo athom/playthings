@@ -90,6 +90,7 @@ handler_t *Signal(int signum, handler_t *handler);
  */
 int main(int argc, char **argv)
 {
+
     char c;
     char cmdline[MAXLINE];
     int emit_prompt = 1; /* emit prompt (default) */
@@ -165,11 +166,37 @@ int main(int argc, char **argv)
 */
 void eval(char *cmdline)
 {
-    // handling quit command
-    if (strcmp(cmdline, "quit\n") == 0)
+    char* argv[MAXARGS];
+    int is_bg;
+    is_bg = parseline(cmdline, argv);
+    if (!builtin_cmd(argv))
     {
-        exit(0);
+        pid_t pid;
+        pid = fork();
+        if (pid == 0) { /* child */
+            int exe_result;
+            exe_result = execve(argv[0], argv, environ);
+            if (exe_result == -1)
+            {
+                unix_error("Execve error");
+            }
+            exit(0);
+        }
+        if (is_bg) {
+            printf("[1] (%d) %s", pid, cmdline);
+	    fflush(stdout);
+        }
+
+        waitfg(pid);
     }
+
+
+
+    //printf("%s %s %s\n", argv[0], argv[1], argv[2]);
+    //exit(0);
+    return;
+
+    //printf("%d\n", is_bg);
 }
 
 /*
@@ -235,6 +262,12 @@ int parseline(const char *cmdline, char **argv)
  */
 int builtin_cmd(char **argv)
 {
+    // handling quit command
+    if (strcmp(argv[0], "quit") == 0 || strcmp(argv[0], "quit\n") == 0)
+    {
+        exit(0);
+    }
+
     return 0;     /* not a builtin command */
 }
 
@@ -243,7 +276,9 @@ int builtin_cmd(char **argv)
  */
 void do_bgfg(char **argv)
 {
-    return;
+    //exit(0);
+    //printf("%s %s %s %s %s %s\n", argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
+    //exit(0);
 }
 
 /*
@@ -251,6 +286,15 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
+    int status;
+    int result_pid;
+    result_pid = waitpid(pid, &status, WUNTRACED);
+    //result_pid = waitpid(pid, &status, WNOHANG);
+    if (result_pid == -1)
+    {
+	unix_error("Waitpid error");
+    }
+
     return;
 }
 
