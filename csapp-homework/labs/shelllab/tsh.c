@@ -182,10 +182,24 @@ void eval(char *cmdline)
             }
             exit(0);
         }
+
+        int job_state = FG;
         if (is_bg) {
-            printf("[1] (%d) %s", pid, cmdline);
-	    fflush(stdout);
+            job_state = BG;
         }
+
+        int job_id = 0;
+        if(addjob(jobs, pid, job_state, cmdline)){
+            struct job_t* job = getjobpid(jobs, pid);
+            job_id = job->jid;
+        }
+
+        if (is_bg) {
+            printf("[%d] (%d) %s", job_id, pid, cmdline);
+	    fflush(stdout);
+            return;
+        }
+
 
         waitfg(pid);
     }
@@ -268,6 +282,12 @@ int builtin_cmd(char **argv)
         exit(0);
     }
 
+    if (strcmp(argv[0], "jobs") == 0 || strcmp(argv[0], "jobs\n") == 0)
+    {
+        listjobs(jobs);
+        return 1;
+    }
+
     return 0;     /* not a builtin command */
 }
 
@@ -288,13 +308,16 @@ void waitfg(pid_t pid)
 {
     int status;
     int result_pid;
-    result_pid = waitpid(pid, &status, WUNTRACED);
+    int options = 0;
+
+
+    result_pid = waitpid(pid, &status, options);
     //result_pid = waitpid(pid, &status, WNOHANG);
     if (result_pid == -1)
     {
 	unix_error("Waitpid error");
     }
-
+    deletejob(jobs, pid);
     return;
 }
 
