@@ -344,6 +344,14 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig)
 {
+
+    pid_t pid;
+    pid = fgpid(jobs);
+    if(pid){
+        struct job_t* job = getjobpid(jobs, pid);
+        printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
+        deletejob(jobs, pid);
+    }
     return;
 }
 
