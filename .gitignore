@@ -1,3 +1,7 @@
 *.out
 *.o
 ./csapp-homework/labs/shelllab/tsh
+./csapp-homework/labs/shelllab/myspin
+./csapp-homework/labs/shelllab/mysplit
+./csapp-homework/labs/shelllab/mystop
+./csapp-homework/labs/shelllab/myint
