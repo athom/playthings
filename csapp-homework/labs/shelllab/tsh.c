@@ -166,19 +166,27 @@ int main(int argc, char **argv)
 */
 void eval(char *cmdline)
 {
+
+    sigset_t mask;
     char* argv[MAXARGS];
     int is_bg;
     is_bg = parseline(cmdline, argv);
     if (!builtin_cmd(argv))
     {
+        sigemptyset(&mask);
+        sigaddset(&mask, SIGCHLD);
+        sigprocmask(SIG_BLOCK, &mask, NULL);
+
         pid_t pid;
         pid = fork();
         if (pid == 0) { /* child */
+            sigprocmask(SIG_UNBLOCK, &mask, NULL);
+            setpgid(0, 0);
             int exe_result;
             exe_result = execve(argv[0], argv, environ);
             if (exe_result == -1)
             {
-                unix_error("Execve error");
+                printf("%s: Command not found\n", argv[0]);
             }
             exit(0);
         }
@@ -188,29 +196,22 @@ void eval(char *cmdline)
             job_state = BG;
         }
 
-        int job_id = 0;
-        if(addjob(jobs, pid, job_state, cmdline)){
-            struct job_t* job = getjobpid(jobs, pid);
-            job_id = job->jid;
-        }
-
-        if (is_bg) {
-            printf("[%d] (%d) %s", job_id, pid, cmdline);
-	    fflush(stdout);
+        if(!addjob(jobs, pid, job_state, cmdline)){
+            unix_error("Add job error");
             return;
         }
+        sigprocmask(SIG_UNBLOCK, &mask, NULL);
 
+        struct job_t* job = getjobpid(jobs, pid);
+        if (job->state == BG) {
+            printf("[%d] (%d) %s", job->jid, pid, cmdline);
+            return;
+        }
 
         waitfg(pid);
     }
 
-
-
-    //printf("%s %s %s\n", argv[0], argv[1], argv[2]);
-    //exit(0);
     return;
-
-    //printf("%d\n", is_bg);
 }
 
 /*
@@ -288,6 +289,18 @@ int builtin_cmd(char **argv)
         return 1;
     }
 
+    if (strcmp(argv[0], "fg") == 0 || strcmp(argv[0], "fg\n") == 0)
+    {
+        do_bgfg(argv);
+        return 1;
+    }
+
+    if (strcmp(argv[0], "bg") == 0 || strcmp(argv[0], "bg\n") == 0)
+    {
+        do_bgfg(argv);
+        return 1;
+    }
+
     return 0;     /* not a builtin command */
 }
 
@@ -296,9 +309,71 @@ int builtin_cmd(char **argv)
  */
 void do_bgfg(char **argv)
 {
-    //exit(0);
-    //printf("%s %s %s %s %s %s\n", argv[0], argv[1], argv[2], argv[3], argv[4], argv[5]);
-    //exit(0);
+    if (argv[1] == NULL){
+        printf("%s command requires PID or %%jobid argument\n", argv[0]);
+        return;
+    }
+
+    int jid;
+    if (argv[1][0] != '%')
+    {
+        int pid = atoi(&argv[1][0]);
+        if (pid == 0)
+        {
+            printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+            return;
+        }
+
+        struct job_t* job = getjobpid(jobs, pid);
+        if (job == NULL)
+        {
+            printf("(%d): No such process\n", pid);
+            return;
+        }
+        jid = job->jid;
+    }else{
+        jid = atoi(&argv[1][1]);
+        if (jid == 0)
+        {
+            printf("%s: argument must be a PID or %%jobid\n", argv[0]);
+            return;
+        }
+    }
+
+
+    int is_bg = 0;
+    if (strcmp(argv[0], "bg") == 0)
+    {
+        is_bg = 1;
+    }
+
+    struct job_t* stopped_job;
+    stopped_job = getjobjid(jobs, jid);
+    if (stopped_job == NULL)
+    {
+        printf("%%%d: No such job\n", jid);
+        return;
+    }
+
+    if (is_bg)
+    {
+        stopped_job->state = BG;
+    }else{
+        stopped_job->state = FG;
+    }
+
+
+    pid_t pid = stopped_job->pid;
+    if (kill(-pid, SIGCONT) < 0)
+    {
+        unix_error("Kill error");
+    }
+
+    if (is_bg) {
+        printf("[%d] (%d) %s", jid, pid, stopped_job->cmdline);
+    }else{
+        waitfg(pid);
+    }
 }
 
 /*
@@ -306,18 +381,13 @@ void do_bgfg(char **argv)
  */
 void waitfg(pid_t pid)
 {
-    int status;
-    int result_pid;
-    int options = 0;
-
-
-    result_pid = waitpid(pid, &status, options);
-    //result_pid = waitpid(pid, &status, WNOHANG);
-    if (result_pid == -1)
-    {
-	unix_error("Waitpid error");
+    //sigset_t mask;
+    //sigemptyset(&mask);
+    //sigaddset(&mask, SIGCHLD);
+    //sigsuspend(&mask);
+    while(pid == fgpid(jobs)){
+        sleep(0);
     }
-    deletejob(jobs, pid);
     return;
 }
 
@@ -334,7 +404,33 @@ void waitfg(pid_t pid)
  */
 void sigchld_handler(int sig)
 {
+    int status;
+    int options = WNOHANG|WUNTRACED;
+    pid_t pid;
+    while((pid = waitpid(-1, &status, options)) > 0){
+        if (WIFSTOPPED(status)) {
+            struct job_t* job = getjobpid(jobs, pid);
+            if (job->state != ST)
+            {
+                job->state = ST;
+                printf("Job [%d] (%d) stopped by signal %d\n", pid2jid(pid), pid, WSTOPSIG(status));
+            }
+        }else if(WIFSIGNALED(status)){
+            int sig = WTERMSIG(status);
+            if (sig == SIGINT)
+            {
+                printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, sig);
+            }
+            deletejob(jobs, pid);
+        }else if (WIFEXITED(status)) {
+            deletejob(jobs, pid);
+        }
+    }
     return;
+    //if (errno != ECHILD)
+    //{
+        //unix_error("waitpid error");
+    //}
 }
 
 /*
@@ -344,15 +440,20 @@ void sigchld_handler(int sig)
  */
 void sigint_handler(int sig)
 {
-
     pid_t pid;
     pid = fgpid(jobs);
-    if(pid){
-        struct job_t* job = getjobpid(jobs, pid);
-        printf("Job [%d] (%d) terminated by signal %d\n", job->jid, job->pid, sig);
-        deletejob(jobs, pid);
+    if (pid <= 0)
+    {
+        return;
     }
-    return;
+
+    if (kill(-pid, SIGKILL) < 0)
+    {
+        unix_error("Kill error");
+    }
+
+    printf("Job [%d] (%d) terminated by signal %d\n", pid2jid(pid), pid, sig);
+    deletejob(jobs, pid);
 }
 
 /*
@@ -362,7 +463,21 @@ void sigint_handler(int sig)
  */
 void sigtstp_handler(int sig)
 {
-    return;
+    pid_t pid;
+    pid = fgpid(jobs);
+    if (pid <= 0)
+    {
+        return;
+    }
+
+    if (kill(-pid, SIGTSTP) < 0)
+    {
+        unix_error("Kill error");
+    }
+
+    struct job_t* job = getjobpid(jobs, pid);
+    job->state = ST;
+    printf("Job [%d] (%d) stopped by signal %d\n", pid2jid(pid), pid, sig);
 }
 
 /*********************
