@@ -36,16 +36,17 @@ public:
         }
 
         int MAXINT = ~(1<<(sizeof(int)*8-1)); // +INF
-        int nullHeadCount = 0;
-        while (nullHeadCount != lists.size()) {
+        while (!lists.empty()) {
             int minVal = MAXINT;
             ListNode* minNode = NULL;
             int index = -1;
-            nullHeadCount = 0;
+
+            bool meetNullHeader = false;
             for (vector<ListNode*>::iterator it = lists.begin(); it != lists.end(); it++) {
                 if (*it == NULL) {
-                    nullHeadCount++;
-                    continue;
+                    lists.erase(it);
+                    meetNullHeader = true;
+                    break;
                 }
 
                 if ((*it)->val < minVal) {
@@ -53,6 +54,9 @@ public:
                     minNode = *it;
                     index = it - lists.begin();
                 }
+            }
+            if (meetNullHeader) {
+                continue;
             }
 
             if (minNode) {
