@@ -20,18 +20,29 @@ public:
             return false;
         }
 
-        int i = 0;
-        int sum = 0;
-        int a, b = 0;
-        while (i < s.size()) {
-            a = int(s[i]);
-            b = int(t[i]);
-            sum ^= a;
-            sum ^= b;
-            i++;
+        if (s.size() == 0) {
+            return true;
         }
 
-        return  sum == 0;
+        if (s.size() == 1) {
+            return s[0] == t[0];
+        }
+
+        bool found = false;
+        for (int i = 0; i < t.size(); ++i) {
+            if (t[i] == s[0]) {
+                s.erase(0, 1);
+                t.erase(i, 1);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            return false;
+        }
+
+        return anagram(s, t);
     }
 };
 
@@ -40,6 +51,7 @@ int main(int argc, char *argv[])
 {
     Solution s;
 
+    assert(s.anagram("man", "six") == false);
     assert(s.anagram("ab", "ab") == true);
     assert(s.anagram("ab", "ba") == true);
     assert(s.anagram("1234", "4321") == true);
