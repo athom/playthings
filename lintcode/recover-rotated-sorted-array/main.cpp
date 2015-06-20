@@ -26,7 +26,8 @@ public:
         while (start + 1 < end) {
             mid = start + (end - start) / 2;
             if (*mid == *end) {
-                start = mid;
+                end--;
+                //start = mid;
             } else if (*mid > *end) {
                 start = mid;
             } else {
@@ -143,6 +144,13 @@ int main(int argc, char *argv[])
     assert(to_str(v) == "5 5 1 1 2 3 4 \n");
     s.recoverRotatedSortedArray(v);
     assert(to_str(v) == "1 1 2 3 4 5 5 \n");
+
+    int a6[] = {1, 1, 1, 1, 1,  1, 1, 1, 1, -1,  1, 1, 1, 1, 1,  1, 1, 1, 1, 1,  1};
+    v = seed_array(a6, 21);
+    assert(to_str(v) == "1 1 1 1 1 1 1 1 1 -1 1 1 1 1 1 1 1 1 1 1 1 \n");
+    s.recoverRotatedSortedArray(v);
+    assert(to_str(v) == "-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 \n");
+
 
     v.clear();
     s.recoverRotatedSortedArray(v);
