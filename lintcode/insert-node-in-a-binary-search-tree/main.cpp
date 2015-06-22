@@ -30,17 +30,49 @@ public:
      * @param node: insert this node into the binary search tree
      * @return: The root of the new binary search tree.
      */
+
+    // Recursive
+    //TreeNode* insertNode(TreeNode* root, TreeNode* node) {
+        //if (root == NULL) {
+            //root = node;
+            //return root;
+        //}
+
+        //if (root->val > node->val) {
+            //root->left = insertNode(root->left, node);
+        //}
+        //if (root->val < node->val) {
+            //root->right = insertNode(root->right, node);
+        //}
+
+        //return root;
+    //}
+
+    // Non recursive
     TreeNode* insertNode(TreeNode* root, TreeNode* node) {
         if (root == NULL) {
             root = node;
             return root;
         }
 
-        if (root->val > node->val) {
-            root->left = insertNode(root->left, node);
+        TreeNode* pre = NULL;
+        TreeNode* cur = root;
+
+
+        while (cur) {
+            if (cur->val < node->val) {
+                pre = cur;
+                cur = cur->right;
+            } else if (cur->val > node->val) {
+                pre = cur;
+                cur = cur->left;
+            }
         }
-        if (root->val < node->val) {
-            root->right = insertNode(root->right, node);
+
+        if (pre->val < node->val) {
+            pre->right = node;
+        } else if (pre->val > node->val) {
+            pre->left = node;
         }
 
         return root;
