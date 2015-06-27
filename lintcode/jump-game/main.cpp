@@ -23,7 +23,6 @@ public:
         int fastest = 0;
         int i = 0;
         while (fastest < (A.size() - 1)) {
-            //cout << "fatest:" << fastest << "   i:" << i << "   A[i]:" << A[i] << endl;
             if (A[i] == 0) {
                 if (i == fastest) {
                     return false;
@@ -63,7 +62,7 @@ vector<int> seed_array(const int* a, int len) {
 int main(int argc, char *argv[]) {
     Solution s;
     vector<int> v;
-    int r;
+    bool r;
 
     v.clear();
     int a1[] = {2, 3, 1, 1, 4};
