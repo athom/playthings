@@ -16,7 +16,7 @@ public:
      * @return: The boolean answer
      */
     bool canJump(vector<int> A) {
-        if (A.empty() && A.size() == 1) {
+        if (A.empty() || A.size() == 1) {
             return true;
         }
 
@@ -69,7 +69,6 @@ int main(int argc, char *argv[]) {
     v = seed_array(a1, 5);
     r = s.canJump(v);
     assert(r == true);
-    return 0;
 
     v.clear();
     int a2[] = {3, 2, 1, 0, 4};
