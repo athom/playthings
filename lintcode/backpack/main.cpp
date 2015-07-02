@@ -1,5 +1,6 @@
 //#include<>
 #include<iostream>
+#include <algorithm>
 #include<sstream>
 #include<vector>
 #include <assert.h>
@@ -57,6 +58,7 @@ public:
             return sum;
         }
 
+        sort(A.begin(), A.end());
 
         vector<int> S;
         vector<vector<int> > M;
@@ -74,6 +76,9 @@ public:
                 bool found = false;
                 for (int j = 0; j < M[k].size(); ++j) {
                     int pick = S[k] + M[k][j];
+                    if (pick > i) {
+                        break;
+                    }
                     if (pick == i) {
                         maxLoad = i;
                         matchRow = k;
