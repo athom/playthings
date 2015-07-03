@@ -23,35 +23,74 @@ class ListNode {
 
 class Solution {
 public:
+    ListNode* findMiddle(ListNode* head){
+        ListNode* fast = head;
+        ListNode* slow = head;
+        ListNode* pre = NULL;
+        while (fast && fast->next) {
+            pre = slow;
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        return pre;
+    }
+
+    ListNode *reverse(ListNode *head) {
+        ListNode* pre = NULL;
+        ListNode* cur = head;
+        while(cur) {
+            ListNode* next = cur->next;
+            cur->next = pre;
+            pre = cur;
+            cur = next;
+        }
+        return pre;
+    }
+    ListNode* mergeTwoLists(ListNode* p1, ListNode* p2) {
+        ListNode* head = NULL;
+        ListNode* cur = head;
+        while (p1 && p2) {
+            if (head == NULL) {
+                head = p1;
+                cur = head;
+                p1 = p1->next;
+                cur->next = p2;
+                cur = cur->next;
+                p2 = p2->next;
+                continue;
+            }
+
+            cur->next = p1;
+            cur = cur->next;
+            p1 = p1->next;
+            cur->next = p2;
+            cur = cur->next;
+            p2 = p2->next;
+        }
+
+        if (p1) {
+            cur->next = p1;
+        }
+        if (p2) {
+            cur->next = p2;
+        }
+        return head;
+    }
     /**
      * @param head: The first node of linked list.
      * @return: void
      */
     void reorderList(ListNode *head) {
-        ListNode* leftPre = NULL;
-        ListNode* leftCur = head;
-        ListNode* rightPre = NULL;
-        ListNode* rightCur = NULL;
-
-        ListNode* prePre = NULL;
-        ListNode* pre = NULL;
-        ListNode* cur = head;
-
-        while (cur) {
-            prePre = pre;
-            pre = cur;
-            cur = cur->next;
+        if (head == NULL || head->next == NULL) {
+            return;
         }
-
-        rightCur = pre;
-        rightPre = prePre;
-
-        while (leftCur) {
-            ListNode* next = leftCur->next;
-
-            leftCur->next = rightCur;
-            rightCur->next = next;
-        }
+        ListNode* middle = findMiddle(head);
+        ListNode* right = middle->next;
+        middle->next = NULL;
+        ListNode* left = head;
+        right = reverse(right);
+        head = mergeTwoLists(left, right);
+        return;
     }
 };
 
@@ -93,30 +132,31 @@ int main(int argc, char *argv[])
 
     int a1[] = {1, 2, 3, 4};
     p = seed_list(a1, 4);
-    p = s.reorderList(p);
+    s.reorderList(p);
     assert(to_str(p) == "1 4 2 3 NULL\n");
 
     int a2[] = {1, 2, 3, 4, 5};
     p = seed_list(a2, 5);
-    p = s.reorderList(p);
+    s.reorderList(p);
     assert(to_str(p) == "1 5 2 4 3 NULL\n");
 
     int a3[] = {1, 2};
     p = seed_list(a3, 2);
-    p = s.reorderList(p);
+    s.reorderList(p);
     assert(to_str(p) == "1 2 NULL\n");
 
     int a4[] = {1, 2, 3};
     p = seed_list(a4, 3);
-    p = s.reorderList(p);
+    s.reorderList(p);
     assert(to_str(p) == "1 3 2 NULL\n");
 
     int a5[] = {1};
     p = seed_list(a5, 1);
-    p = s.reorderList(p);
+    s.reorderList(p);
     assert(to_str(p) == "1 NULL\n");
 
-    p = s.reorderList(NULL);
+    p = NULL;
+    s.reorderList(p);
     assert(to_str(p) == "NULL\n");
     return 0;
 }
