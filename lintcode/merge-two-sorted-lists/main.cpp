@@ -28,47 +28,88 @@ public:
      * @param ListNode l2 is the head of the linked list
      * @return: ListNode head of linked list
      */
-    ListNode *mergeTwoLists(ListNode *l1, ListNode *l2) {
-        // write your code here
-        if (l2 == NULL) {
-            return l1;
+    ListNode *mergeTwoLists(ListNode *p1, ListNode *p2) {
+        if (p1 == NULL) {
+            return p2;
         }
-        if (l1 == NULL) {
-            return l2;
+        if (p2 == NULL) {
+            return p1;
         }
-        ListNode* head1 = l1;
-        ListNode* cur1 = l1;
-        ListNode* cur2 = l2;
-        ListNode* pre1 = NULL;
-        while(cur1) {
-            if (cur2 == NULL) {
-                break;
-            }
-            while (cur2 && (cur1->val > cur2->val)) {
-                // insert before list1's first node
-                if (pre1 == NULL) {
-                    ListNode* cur2_next = cur2->next;
-                    cur2->next = cur1;
-                    head1 = cur2;
-                    pre1 = cur2;
-                    cur2 = cur2_next;
+        ListNode* head = NULL;
+        ListNode* cur = head;
+        while (p1 && p2) {
+            if (head == NULL) {
+                if (p1->val < p2->val) {
+                    head = p1;
+                    p1 = p1->next;
                 } else {
-                    ListNode* cur2_next = cur2->next;
-                    cur2->next = cur1;
-                    pre1->next = cur2;
-                    pre1 = cur2;
-                    cur2 = cur2_next;
+                    head = p2;
+                    p2 = p2->next;
                 }
+                cur = head;
+                continue;
             }
-            pre1 = cur1;
-            cur1 = cur1->next;
+
+            if (p1->val < p2->val) {
+                cur->next = p1;
+                p1 = p1->next;
+            } else {
+                cur->next = p2;
+                p2 = p2->next;
+            }
+            cur = cur->next;
         }
 
-        if (cur2) {
-            pre1->next = cur2;
+        if (p1) {
+            cur->next = p1;
         }
-        return head1;
+        if (p2) {
+            cur->next = p2;
+        }
+        return head;
+
     }
+    //ListNode *mergeTwoLists(ListNode *l1, ListNode *l2) {
+        //// write your code here
+        //if (l2 == NULL) {
+            //return l1;
+        //}
+        //if (l1 == NULL) {
+            //return l2;
+        //}
+        //ListNode* head1 = l1;
+        //ListNode* cur1 = l1;
+        //ListNode* cur2 = l2;
+        //ListNode* pre1 = NULL;
+        //while(cur1) {
+            //if (cur2 == NULL) {
+                //break;
+            //}
+            //while (cur2 && (cur1->val > cur2->val)) {
+                //// insert before list1's first node
+                //if (pre1 == NULL) {
+                    //ListNode* cur2_next = cur2->next;
+                    //cur2->next = cur1;
+                    //head1 = cur2;
+                    //pre1 = cur2;
+                    //cur2 = cur2_next;
+                //} else {
+                    //ListNode* cur2_next = cur2->next;
+                    //cur2->next = cur1;
+                    //pre1->next = cur2;
+                    //pre1 = cur2;
+                    //cur2 = cur2_next;
+                //}
+            //}
+            //pre1 = cur1;
+            //cur1 = cur1->next;
+        //}
+
+        //if (cur2) {
+            //pre1->next = cur2;
+        //}
+        //return head1;
+    //}
 };
 
 string to_str(ListNode* p){
