@@ -42,25 +42,48 @@ public:
 
         //return cur;
     //}
-    ListNode *detectCycle(ListNode *head) {
-        if (head == NULL) {
+    //ListNode *detectCycle(ListNode *head) {
+        //if (head == NULL) {
+            //return NULL;
+        //}
+
+        //ListNode* dummy = new ListNode(0);
+        //ListNode* preDummy = NULL;
+        //ListNode* cur = head;
+        //while (cur && cur != dummy) {
+            //ListNode* next = cur->next;
+            //cur->next = dummy;
+            //preDummy = cur;
+            //cur = next;
+        //}
+
+        //if (cur) {
+            //return preDummy;
+        //}
+        //return NULL;
+    //}
+
+        ListNode *detectCycle(ListNode *head) {
+        if (head == NULL || head->next == NULL) {
             return NULL;
         }
 
-        ListNode* dummy = new ListNode(0);
-        ListNode* preDummy = NULL;
-        ListNode* cur = head;
-        while (cur && cur != dummy) {
-            ListNode* next = cur->next;
-            cur->next = dummy;
-            preDummy = cur;
-            cur = next;
+        ListNode* fast = head->next;
+        ListNode* slow = head;
+        while (fast != slow) {
+            if (fast == NULL || fast->next == NULL) {
+                return NULL;
+            }
+            slow = slow->next;
+            fast = fast->next->next;
         }
 
-        if (cur) {
-            return preDummy;
+        while (head != slow->next) {
+            head = head->next;
+            slow = slow->next;
         }
-        return NULL;
+
+        return head;
     }
 };
 
@@ -181,6 +204,12 @@ int main(int argc, char *argv[])
     p = seed_list(a4, 1);
     p->next = p;
     assert(s.detectCycle(p) == p);
+
+    int a5[] = {1, 2, 3, 4, 5};
+    p = seed_list(a1, 5);
+    p->next->next->next->next = p->next;
+    pd = p->next;
+    assert(s.detectCycle(p) == pd);
 
     assert(s.detectCycle(NULL) == NULL);
     return 0;
