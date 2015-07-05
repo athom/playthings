@@ -28,19 +28,39 @@ public:
      * @return: The node where the cycle begins.
      *           if there is no cycle, return null
      */
+    //ListNode *detectCycle(ListNode *head) {
+        //if (head == NULL) {
+            //return NULL;
+        //}
+
+        //map<ListNode*, bool> m;
+        //ListNode* cur = head;
+        //while (cur && m.find(cur) == m.end()) {
+            //m[cur] = true;
+            //cur = cur->next;
+        //}
+
+        //return cur;
+    //}
     ListNode *detectCycle(ListNode *head) {
         if (head == NULL) {
             return NULL;
         }
 
-        map<ListNode*, bool> m;
+        ListNode* dummy = new ListNode(0);
+        ListNode* preDummy = NULL;
         ListNode* cur = head;
-        while (cur && m.find(cur) == m.end()) {
-            m[cur] = true;
-            cur = cur->next;
+        while (cur && cur != dummy) {
+            ListNode* next = cur->next;
+            cur->next = dummy;
+            preDummy = cur;
+            cur = next;
         }
 
-        return cur;
+        if (cur) {
+            return preDummy;
+        }
+        return NULL;
     }
 };
 
@@ -80,10 +100,74 @@ int main(int argc, char *argv[])
     ListNode* pd;
     //ListNode* last;
 
+    int a0[] = {-21,10,17,8,4, 26,5,35,33,-7, -16,27,-12,6,29, -12,5,9,20,14, 14,2,13,-24,21, 23,-21,5};
+    p = seed_list(a0, 28);
+    pd = p->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next;
+    p->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next->
+        next = pd;
+
+
+
+    assert(s.detectCycle(p) == pd);
+
     int a1[] = {1, 4, 3, 2, 5, 2};
     p = seed_list(a1, 6);
     p->next->next->next->next->next = p->next->next;
-    assert(s.detectCycle(p) == p->next->next);
+    pd = p->next->next;
+    assert(s.detectCycle(p) == pd);
 
     int a2[] = {1, 4, 3, 2, 5, 2};
     p = seed_list(a2, 6);
