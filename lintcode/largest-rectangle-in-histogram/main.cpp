@@ -3,48 +3,65 @@
 #include<sstream>
 #include<vector>
 #include<map>
+#include<stack>
 #include <assert.h>
 #include <utility>
 
 using namespace std;
 
+//class Solution {
+//public:
+    //int largestRectangleAreaHelper(vector<int> &height, int left, int right) {
+        //if (right - left < 0) {
+            //return 0;
+        //}
+
+        //int INF = ~(1<<31);
+        //int min = INF;
+        //int minIndex = -1;
+        //for (int i = left; i <= right; ++i) {
+            //if (height[i] < min) {
+                //min = height[i];
+                //minIndex = i;
+            //}
+        //}
+
+        //int area = -INF;
+        //int midArea = min * (right-left+1);
+        //int newRight = minIndex-1;
+        //int newLeft = minIndex+1;
+
+        //int leftArea = largestRectangleAreaHelper(height, left, newRight);
+        //int rightArea = largestRectangleAreaHelper(height, newLeft, right);
+
+
+        //if (midArea > area) {
+            //area = midArea;
+        //}
+        //if (leftArea > area) {
+            //area = leftArea;
+        //}
+        //if (rightArea > area) {
+            //area = rightArea;
+        //}
+        //return area;
+    //}
+    ///**
+     //* @param height: A list of integer
+     //* @return: The area of largest rectangle in the histogram
+     //*/
+    //int largestRectangleArea(vector<int> &height) {
+        //int sz = height.size();
+        //if (sz == 0) {
+            //return 0;
+        //}
+
+        //return largestRectangleAreaHelper(height, 0, sz-1);
+    //}
+//};
+
 class Solution {
 public:
-    int largestRectangleAreaHelper(vector<int> &height, int left, int right) {
-        if (right - left < 0) {
-            return 0;
-        }
-
-        int INF = ~(1<<31);
-        int min = INF;
-        int minIndex = -1;
-        for (int i = left; i <= right; ++i) {
-            if (height[i] < min) {
-                min = height[i];
-                minIndex = i;
-            }
-        }
-
-        int area = -INF;
-        int midArea = min * (right-left+1);
-        int newRight = minIndex-1;
-        int newLeft = minIndex+1;
-
-        int leftArea = largestRectangleAreaHelper(height, left, newRight);
-        int rightArea = largestRectangleAreaHelper(height, newLeft, right);
-
-
-        if (midArea > area) {
-            area = midArea;
-        }
-        if (leftArea > area) {
-            area = leftArea;
-        }
-        if (rightArea > area) {
-            area = rightArea;
-        }
-        return area;
-    }
     /**
      * @param height: A list of integer
      * @return: The area of largest rectangle in the histogram
@@ -55,7 +72,31 @@ public:
             return 0;
         }
 
-        return largestRectangleAreaHelper(height, 0, sz-1);
+        int INF = ~(1<<31);
+        stack<int> s;
+
+        int area = -INF;
+        for (int i = 0; i <= sz; ++i) {
+            int cur = height[i];
+            if (i == sz) {
+                cur = -1;
+            }
+            while (!s.empty() && height[s.top()] >= cur) {
+                int popIndex = s.top();
+                int h = height[popIndex];
+                s.pop();
+                int w;
+                if (s.empty()) {
+                    w = i;
+                } else {
+                    w = i - s.top() - 1;
+                }
+                area = max(area, w*h);
+            }
+            s.push(i);
+        }
+
+        return area;
     }
 };
 
@@ -110,12 +151,16 @@ int main(int argc, char *argv[])
     assert(r == 2);
 
 
-
     int a7[] = {2, 1, 5, 6, 2, 3};
     v = seed_array(a7, 6);
     r = s.largestRectangleArea(v);
     assert(r == 10);
 
+    int a8[] = {1, 1, 2, 2};
+    v = seed_array(a8, 4);
+    assert(to_str(v) == "1 1 2 2 \n");
+    r = s.largestRectangleArea(v);
+    assert(r == 4);
 
     v.clear();
     r = s.largestRectangleArea(v);
