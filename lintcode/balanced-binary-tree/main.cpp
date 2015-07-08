@@ -190,7 +190,6 @@ int main(int argc, char *argv[])
     assert(to_str(root) == "2 NULL 4 3 NULL NULL NULL");
     r = s.isBalanced(root);
     assert(r == false);
-    return 0;
 
     //          2
     //         / \
