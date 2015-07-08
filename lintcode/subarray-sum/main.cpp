@@ -22,26 +22,30 @@ public:
             return v;
         }
 
+        int sum = 0;
         map<int, int> m;
         for (int i = 0; i < sz; ++i) {
-            m[i] = nums[i];
             if (nums[i] == 0) {
                 v.push_back(i);
                 v.push_back(i);
                 return v;
             }
+            sum += nums[i];
+            if (sum == 0) {
+                v.push_back(0);
+                v.push_back(i);
+                return v;
+            }
+
+
+            if (m.find(sum) != m.end()) {
+                v.push_back(m.at(sum)+1);
+                v.push_back(i);
+                return v;
+            }
+            m[sum] = i;
         }
 
-        for (int i = 0; i < sz; ++i) {
-            for (int j = sz-1; j > i; j--) {
-                m[j] = m[j-1] + nums[j];
-                if (m[j] == 0) {
-                    v.push_back(j-i-1);
-                    v.push_back(j);
-                    return v;
-                }
-            }
-        }
 
         return v;
     }
@@ -78,8 +82,8 @@ int main(int argc, char *argv[])
     v = seed_array(a4, 10);
     assert(to_str(v) == "-5 10 5 -3 1 1 1 -2 3 -4 \n");
     r = s.subarraySum(v);
-    assert(r[0] == 5);
-    assert(r[1] == 7);
+    assert(r[0] == 3);
+    assert(r[1] == 6);
 
     int a1[] = {1, 2, 3, -1, -1, -1};
     v = seed_array(a1, 6);
@@ -92,16 +96,23 @@ int main(int argc, char *argv[])
     v = seed_array(a2, 5);
     assert(to_str(v) == "-3 1 2 -3 4 \n");
     r = s.subarraySum(v);
-    assert(r[0] == 1);
-    assert(r[1] == 3);
+    assert(r[0] == 0);
+    assert(r[1] == 2);
 
     int a3[] = {5, -3, 1, 2, -3, 4};
     v = seed_array(a3, 6);
     assert(to_str(v) == "5 -3 1 2 -3 4 \n");
     r = s.subarraySum(v);
-    assert(r[0] == 2);
-    assert(r[1] == 4);
+    assert(r[0] == 1);
+    assert(r[1] == 3);
 
+
+    int a5[] = {1, -1};
+    v = seed_array(a5, 2);
+    assert(to_str(v) == "1 -1 \n");
+    r = s.subarraySum(v);
+    assert(r[0] == 0);
+    assert(r[1] == 1);
 
     return 0;
 }
