@@ -1,9 +1,10 @@
 //#include<>
-#include<iostream>
-#include<sstream>
-#include<vector>
-#include<queue>
-#include<map>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <queue>
+#include <stack>
+#include <map>
 #include <assert.h>
 #include <utility>
 
@@ -21,41 +22,90 @@ class TreeNode {
             this->left = this->right = NULL;
         }
 };
+//class Solution {
+//public:
+    //TreeNode* maxTreeHelper(vector<int> A, int left, int right) {
+        //if (right < left) {
+            //return NULL;
+        //}
+
+        //int INF = ~(1<<31);
+        //int maxValue = -INF;
+        //int maxIndex = -1;
+        //for (int i = left; i <= right; ++i) {
+            //if (A[i] > maxValue) {
+               //maxValue = A[i];
+               //maxIndex = i;
+            //}
+        //}
+
+        //TreeNode* node = new TreeNode(maxValue);
+        //TreeNode* leftTree = maxTreeHelper(A, left, maxIndex-1);
+        //TreeNode* rightTree = maxTreeHelper(A, maxIndex+1, right);
+        //node->left = leftTree;
+        //node->right = rightTree;
+        //return node;
+    //}
+    ///**
+     //* @param A: Given an integer array with no duplicates.
+     //* @return: The root of max tree.
+     //*/
+    //TreeNode* maxTree(vector<int> A) {
+        //int sz = A.size();
+        //if (sz == 0 ) {
+            //return 0;
+        //}
+        //return maxTreeHelper(A, 0, sz-1);
+    //}
+//};
 
 class Solution {
 public:
-    TreeNode* maxTreeHelper(vector<int> A, int left, int right) {
-        if (right < left) {
-            return NULL;
-        }
-
-        int INF = ~(1<<31);
-        int maxValue = -INF;
-        int maxIndex = -1;
-        for (int i = left; i <= right; ++i) {
-            if (A[i] > maxValue) {
-               maxValue = A[i];
-               maxIndex = i;
-            }
-        }
-
-        TreeNode* node = new TreeNode(maxValue);
-        TreeNode* leftTree = maxTreeHelper(A, left, maxIndex-1);
-        TreeNode* rightTree = maxTreeHelper(A, maxIndex+1, right);
-        node->left = leftTree;
-        node->right = rightTree;
-        return node;
-    }
     /**
      * @param A: Given an integer array with no duplicates.
      * @return: The root of max tree.
      */
     TreeNode* maxTree(vector<int> A) {
         int sz = A.size();
-        if (sz == 0 ) {
-            return 0;
+        if (sz == 1) {
+            TreeNode* node = new TreeNode(A[0]);
+            return node;
         }
-        return maxTreeHelper(A, 0, sz-1);
+
+        stack<TreeNode*> s;
+
+        TreeNode* cur = NULL;
+        for (int i = 0; i < sz; ++i) {
+            TreeNode* node = new TreeNode(A[i]);
+
+            if (s.empty()) {
+                s.push(node);
+                continue;
+            }
+
+            cur = NULL;
+            while (!s.empty() && s.top()->val < node->val) {
+                TreeNode* po = s.top();
+                s.pop();
+                po->right = cur;
+                cur = po;
+            }
+            if (cur) {
+                node->left = cur;
+            }
+
+            s.push(node);
+        }
+
+        cur = NULL;
+        while (!s.empty()) {
+            TreeNode* node = s.top();
+            s.pop();
+            node->right = cur;
+            cur = node;
+        }
+
+        return cur;
     }
 };
 
