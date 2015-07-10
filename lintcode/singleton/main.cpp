@@ -19,14 +19,15 @@ public:
      */
     static Solution* getInstance() {
         if (m_instance == NULL) {
-            m_instance = new Solution();
+            m_instance = new Solution;
         }
         return m_instance;
     }
     ~Solution(){
     }
 };
-Solution::m_instance = NULL;
+
+Solution* Solution::m_instance = NULL;
 
 
 int main(int argc, char *argv[])
