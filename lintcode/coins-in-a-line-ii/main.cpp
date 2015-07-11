@@ -7,6 +7,17 @@
 
 using namespace std;
 
+string to_str(vector<int> s){
+    ostringstream os;
+    int i = 0;
+    while(i<s.size()){
+        os << s[i] << " ";
+        i++;
+    }
+    os << endl;
+    return os.str();
+}
+
 class Solution {
 public:
     /**
@@ -19,24 +30,28 @@ public:
             return true;
         }
 
-        int sum = 0;
-        for (int i = 0; i < sz; ++i) {
-            sum += values[i];
+
+        vector<int> x;
+        vector<int> y;
+
+        x.push_back(values[sz-1]);
+        x.push_back(values[sz-2] + values[sz-1]);
+        y.push_back(0);
+        y.push_back(0);
+
+        for (int i = 2; i < sz; ++i) {
+            int take_one = values[sz-i-1] + y[i-1];
+            int take_two = values[sz-i-1] + values[sz-i] + y[i-2];
+            if (take_one > take_two) {
+                x.push_back(take_one);
+                y.push_back(x[i-1]);
+            } else {
+                x.push_back(take_two);
+                y.push_back(x[i-2]);
+            }
         }
 
-        vector<int> f;
-        f.push_back(0);
-        f.push_back(values[sz-1]);
-        f.push_back(values[sz-2] + values[sz-1]);
-        f.push_back(values[sz-3] + values[sz-2]);
-
-        for (int i = 4; i <= sz; ++i) {
-            int take_two = values[sz-i] + values[sz-i+1] + f[i-4];
-            int take_one = values[sz-i] + f[i-3];
-            f.push_back(max(take_one, take_two));
-        }
-
-        return f[sz] > (sum - f[sz]);
+        return x[sz-1] > y[sz-1];
     }
 };
 
@@ -48,16 +63,6 @@ vector<int> seed_array(const int* a, int len) {
     return v;
 }
 
-string to_str(vector<int> s){
-    ostringstream os;
-    int i = 0;
-    while(i<s.size()){
-        os << s[i] << " ";
-        i++;
-    }
-    os << endl;
-    return os.str();
-}
 
 
 int main(int argc, char *argv[])
@@ -87,7 +92,7 @@ int main(int argc, char *argv[])
 
     int a5[] = {100,200,400, 300,400,800, 500,600,1200};
     v = seed_array(a5, 9);
-    assert(s.firstWillWin(v) == true);
+    assert(s.firstWillWin(v) == false);
 
     return 0;
 }
