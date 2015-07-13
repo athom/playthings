@@ -9,7 +9,7 @@ using namespace std;
 
 class Solution {
 public:
-    int mod(int x, int m) {
+    int mod(unsigned long long x, int m) {
         if (m == 1) {
             return 0;
         }
@@ -34,10 +34,13 @@ public:
         }
 
         int r = fastPower(a, b, n/2);
-        if (n % 2 == 0) {
-            return mod(r*r, b);
+        long long m = (long long)(r)* (long long)(r);
+        if (n % 2 == 1) {
+            m = mod(m, b);
+            m = m*a;
+            return mod(m, b);
         } else {
-            return mod(r*r*a, b);
+            return mod(m, b);
         }
     }
 };
@@ -45,10 +48,17 @@ public:
 int main(int argc, char *argv[])
 {
     Solution s;
+    assert(s.fastPower(109, 10000007, 1000001) == 5249911);
     assert(s.fastPower(3, 7, 2) == 2);
     assert(s.fastPower(3, 4, 7) == 3);
     assert(s.fastPower(2, 3, 31) == 2);
     assert(s.fastPower(100, 1000, 1000) == 0);
     assert(s.fastPower(1, 2147483647, 2147483647) == 1);
+    assert(s.fastPower(2, 1, 2147483647) == 0);
+    assert(s.fastPower(2, 3, 3) == 2);
+    assert(s.fastPower(2, 5, 5) == 2);
+    assert(s.fastPower(2, 6, 6) == 4);
+    assert(s.fastPower(2, 7, 7) == 2);
+    assert(s.fastPower(2, 2147483647, 2147483647) == 2);
     return 0;
 }
